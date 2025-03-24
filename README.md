@@ -44,11 +44,15 @@ Replace `YOUR_USERNAME` with your actual GitHub username.
 
 ```plaintext
 AventuriersDuRail/
-├── LesAventuriersDuRail.py   # Core classes and game logic
-├── Lancement.py              # Entry point to launch the game
-├── Tests.py                  # Unit tests (run with unittest)
-├── Diag_classe.py            # Generates class diagrams
-└── README.md                 # Project documentation (this file)
+├── LesAventuriersDuRail.py       # Core classes and game logic
+├── LesAventuriersDuRail2.py      # Additional or experimental implementations
+├── Lancement.py                  # Entry point to launch the game
+├── Tests.py                      # Unit tests (run with unittest)
+├── Diag_classe.py                # Generates class diagrams
+├── diagramme_classes_aventuriers_du_rail.gv # Class diagram file
+├── myplot.png                    # Generated class diagram image
+├── requirements.txt              # Python dependencies
+└── README.md                     # Project documentation (this file)
 ```
 
 ## Running tests
