@@ -6,41 +6,41 @@ import matplotlib.pyplot as plt
 
 # Définition des villes du plateau USA
 VILLES_USA = {
-    "Atlanta": (33.75, -84.39),
-    "Boston": (42.35, -71.05),
-    "Calgary": (51.05, -114.05),
-    "Charleston": (32.78, -79.93),
-    "Chicago": (41.83, -87.62),
-    "Dallas": (32.77, -96.79),
-    "Denver": (39.74, -104.99),
-    "Duluth": (46.78, -92.11),
-    "El Paso": (31.76, -106.49),
-    "Helena": (46.59, -112.02),
-    "Houston": (29.76, -95.36),
-    "Kansas City": (39.08, -94.58),
-    "Las Vegas": (36.17, -115.14),
-    "Little Rock": (34.74, -92.33),
-    "Los Angeles": (34.05, -118.24),
-    "Miami": (25.78, -80.21),
-    "Montreal": (45.50, -73.56),
-    "Nashville": (36.16, -86.78),
-    "New Orleans": (29.95, -90.07),
-    "New York": (40.71, -74.01),
-    "Oklahoma City": (35.47, -97.51),
-    "Omaha": (41.26, -95.94),
-    "Phoenix": (33.45, -112.07),
-    "Pittsburgh": (40.44, -79.99),
-    "Portland": (45.52, -122.68),
-    "Raleigh": (35.78, -78.64),
-    "Saint Louis": (38.63, -90.20),
-    "Salt Lake City": (40.76, -111.89),
-    "San Francisco": (37.77, -122.42),
-    "Santa Fe": (35.68, -105.94),
-    "Seattle": (47.61, -122.33),
-    "Toronto": (43.65, -79.38),
-    "Vancouver": (49.28, -123.12),
-    "Washington": (38.90, -77.04),
-    "Winnipeg": (49.90, -97.14)
+    "Atlanta": (0.62, 0.35),
+    "Boston": (0.88, 0.80),
+    "Calgary": (0.15, 0.95),
+    "Charleston": (0.70, 0.30),
+    "Chicago": (0.60, 0.60),
+    "Dallas": (0.48, 0.32),
+    "Denver": (0.35, 0.55),
+    "Duluth": (0.55, 0.70),
+    "El Paso": (0.28, 0.28),
+    "Helena": (0.28, 0.75),
+    "Houston": (0.50, 0.25),
+    "Kansas City": (0.48, 0.48),
+    "Las Vegas": (0.20, 0.45),
+    "Little Rock": (0.52, 0.38),
+    "Los Angeles": (0.15, 0.25),
+    "Miami": (0.80, 0.00),
+    "Montreal": (0.85, 0.88),
+    "Nashville": (0.60, 0.42),
+    "New Orleans": (0.55, 0.22),
+    "New York": (0.86, 0.75),
+    "Oklahoma City": (0.42, 0.40),
+    "Omaha": (0.47, 0.58),
+    "Phoenix": (0.22, 0.32),
+    "Pittsburgh": (0.74, 0.65),
+    "Portland": (0.10, 0.85),
+    "Raleigh": (0.72, 0.42),
+    "Saint Louis": (0.52, 0.50),
+    "Salt Lake City": (0.22, 0.55),
+    "San Francisco": (0.08, 0.40),
+    "Santa Fe": (0.30, 0.38),
+    "Sault Ste Marie": (0.62, 0.80),
+    "Seattle": (0.07, 0.95),
+    "Toronto": (0.77, 0.80),
+    "Vancouver": (0.05, 0.97),
+    "Washington": (0.78, 0.65),
 }
 
 # Définition des routes (Ville1, Ville2, couleur, longueur)
@@ -139,6 +139,7 @@ ROUTES_USA = [
 ]
 
 
+
 # Définition des cartes destination (Ville1, Ville2, points)
 CARTES_DESTINATION_USA = [
     ("Los Angeles", "New York", 21), ("Duluth", "Houston", 8), ("Chicago", "New Orleans", 7),
@@ -159,7 +160,7 @@ class Table:
     def __init__(self, joueurs):
         self.joueurs = joueurs
         self.plateau = Plateau(VILLES_USA, ROUTES_USA)
-        self.pioche_wagon = PiocheWagon([CarteWagon(c) for c in ["rouge", "bleu", "vert", "jaune", "noir", "blanc", "orange", "violet"] * 12 + ["locomotive"] * 14])
+        self.pioche_wagon = PiocheWagon([CarteWagon(c) for c in ["red", "blue", "green", "yellow", "black", "white", "orange", "pink"] * 12 + ["locomotive"] * 14])
         self.pioche_itineraire = PiocheItineraire([CarteItineraire(v1, v2, p) for v1, v2, p in CARTES_DESTINATION_USA])
 
     def initialiser_partie(self):
@@ -577,7 +578,7 @@ class Plateau:
 
         # Ajouter les villes comme nœuds
         for ville in self.villes:
-            G.add_node(ville.nom, pos=(ville.coordonnees[1], ville.coordonnees[0]))  # (longitude, latitude)
+            G.add_node(ville.nom, pos=(ville.coordonnees[0], ville.coordonnees[1]))  # (abcisse, ordonnée)
 
         # Ajouter les routes comme arêtes
         for route in self.routes:

@@ -1,3 +1,9 @@
 si c'est gris, j'aimerai choisir quelle couleur j'utilise
 
 Si je n'ai pas les cartes nécessaires, je veux pouvoir retourner en arrière automatiquement sur le choix à faire.
+
+rechoisir après faux choix
+
+si on repose une carte dest on réaffiche les cartes entrain d'etres choisir
+
+on affiche regulièrement les cartes du joueur pour qui c'est le tour

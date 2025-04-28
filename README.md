@@ -45,7 +45,6 @@ Replace `YOUR_USERNAME` with your actual GitHub username.
 ```plaintext
 AventuriersDuRail/
 ├── LesAventuriersDuRail.py       # Core classes and game logic
-├── LesAventuriersDuRail2.py      # Additional or experimental implementations
 ├── Lancement.py                  # Entry point to launch the game
 ├── Tests.py                      # Unit tests (run with unittest)
 ├── Diag_classe.py                # Generates class diagrams
@@ -66,7 +65,6 @@ use of unittest
 
 ## Future improvements
 
-- Scoring system (by Zachary @Zaskobis)
 - Basic AI player (random choices ignoring new destination cards)
 - Graphical User Interface (supposedly using PyQt5)
 
