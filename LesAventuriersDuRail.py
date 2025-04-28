@@ -165,6 +165,7 @@ class Table:
         # Marquer la route comme occupée
         route_choisie.dispo = False
         route_choisie.possesseur = joueur
+        joueur.routes_capturees.append(route_choisie)
         joueur.wagons_restants -= route_choisie.longueur
 
         print(f"{joueur.nom} a capturé la route {route_choisie.Ville1} → {route_choisie.Ville2}!")
@@ -310,6 +311,7 @@ class Joueur:
     def __init__(self, nom, couleur):
         self.nom = nom
         self.couleur = couleur
+        self.routes_capturees = []
         self.cartes_wagon = []  # Cartes wagon en main
         self.cartes_defi = []  # Cartes destination/objectifs
         self.wagons_restants = 45  # Wagons restants au début
@@ -357,6 +359,46 @@ class Joueur:
                 return True
 
         return False
+
+    def calculer_points_routes(self):
+        points = 0
+        for route in self.routes_capturees:
+            if route.longueur == 1:
+                points += 1
+            elif route.longueur == 2:
+                points += 2
+            elif route.longueur == 3:
+                points += 4
+            elif route.longueur == 4:
+                points += 7
+            elif route.longueur == 5:
+                points += 10
+            elif route.longueur == 6:
+                points += 15
+        return points
+
+    def villes_reliees(self, ville_depart, ville_arrivee):
+        """Vérifie si deux villes sont reliées par les routes capturées par ce joueur."""
+        G = nx.Graph()
+
+        for route in self.routes_capturees:
+            G.add_edge(route.Ville1, route.Ville2)
+
+        try:
+            return nx.has_path(G, ville_depart, ville_arrivee)
+        except nx.NetworkXError:
+            return False
+
+    def calculer_points_destinations(self):
+            points = 0
+            for destination in self.cartes_defi:
+                if self.villes_reliees(destination.ville_depart, destination.ville_arrivee):
+                    print(f"Objectif réussi : {destination.ville_depart} → {destination.ville_arrivee} (+{destination.points} points)")
+                    points += destination.points
+                else:
+                    print(f"Objectif échoué : {destination.ville_depart} → {destination.ville_arrivee} (+{destination.points} points)")
+                    points -= destination.points
+            return points
 
 # Classe représentant les cartes wagon
 class CarteWagon:
