@@ -245,6 +245,9 @@ class Table:
         route_choisie.possesseur = joueur
         joueur.routes_capturees.append(route_choisie)
         joueur.wagons_restants -= route_choisie.longueur
+        
+        # Actualiser l'affichage du plateau après capture de la route
+        self.plateau.afficher_plateau_graphique()  # Mise à jour visuelle du plateau
 
         print(f"{joueur.nom} a capturé la route {route_choisie.Ville1} → {route_choisie.Ville2}!")
 
@@ -280,7 +283,6 @@ class Table:
         print("\nCartes disponibles :")
         for i, carte in enumerate(self.pioche_wagon.visible):
             print(f"{carte.couleur}")
-
         # Premier tirage
         carte1, pioche = self.choisir_carte_wagon()
         if not carte1:
@@ -334,9 +336,11 @@ class Table:
                     # Remplacement de la carte visible
                     if self.pioche_wagon.pioche:
                         self.pioche_wagon.visible.append(self.pioche_wagon.piocher_cachee())
+                        self.pioche_wagon.verifier_visibles_sans_3_locomotives()
                     else:
                         self.pioche_wagon.remelanger_si_vide()
                         self.pioche_wagon.visible.append(self.pioche_wagon.piocher_cachee())
+                        self.pioche_wagon.verifier_visibles_sans_3_locomotives()
 
                     print(f"Vous avez choisi la carte {carte.couleur}.")
                     return carte, 1
@@ -513,6 +517,7 @@ class PiocheWagon:
             self.remelanger_si_vide()  # Vérifier et mélanger si nécessaire
             if self.pioche:
                 self.visible.append(self.pioche.pop())
+                self.verifier_visibles_sans_3_locomotives()
             return carte
         return None
 
@@ -535,7 +540,7 @@ class PiocheWagon:
             random.shuffle(self.pioche)
 
     def verifier_visibles_sans_3_locomotives(self):
-        """Vérifie que la pioche visible ne contient pas 5 locomotives.
+        """Vérifie que la pioche visible ne contient pas 3 locomotives.
         Si c'est le cas, mélange les cartes visibles et cachées (sans toucher à la défausse)."""
         nb_locomotives = sum(1 for carte in self.visible if carte.is_locomotive)
         if nb_locomotives >= 3:  # 3 locomotives ou plus, on remélange
@@ -581,16 +586,27 @@ class Plateau:
 
         # Ajouter les routes comme arêtes
         for route in self.routes:
-            G.add_edge(route.Ville1, route.Ville2, color=route.couleur, weight=route.longueur)
+            color = route.couleur if route.etat == "disponible" else "purple"  # Couleur normale ou gris pour les capturées
+            style = "solid" if route.etat == "disponible" else "dotted"  # Style de ligne
+            G.add_edge(route.Ville1, route.Ville2, color=color, style=style, weight=route.longueur)
 
         # Préparer l'affichage
         pos = nx.get_node_attributes(G, 'pos')
         couleurs = [G[u][v]['color'] for u, v in G.edges()]
+        styles = [G[u][v].get('style', 'solid') for u, v in G.edges()]  # Récupère le style de chaque arête
         poids = [G[u][v]['weight'] for u, v in G.edges()]
+        
+        # Ajouter des annotations si une route est capturée
+        for route in self.routes:
+            if route.etat == "capturée":
+                x_pos = (pos[route.Ville1][0] + pos[route.Ville2][0]) / 2
+                y_pos = (pos[route.Ville1][1] + pos[route.Ville2][1]) / 2
+                plt.text(x_pos, y_pos, "capturée", fontsize=10, ha='center', color="black")
+
 
         # Afficher
         plt.figure(figsize=(12, 8))
-        nx.draw(G, pos, with_labels=True, edge_color=couleurs, width=poids, node_size=500, font_size=8)
+        nx.draw(G, pos, with_labels=True, edge_color=couleurs, width=poids, node_size=500, font_size=8, style = styles)
         plt.title("Plateau des Aventuriers du Rail (Version USA)")
         plt.show()
 
@@ -609,6 +625,12 @@ class Route:
         self.longueur = longueur
         self.couleur = couleur
         self.possesseur = None
+        self.etat = "disponible"  # Par défaut, la route est disponible
+    
+    def capturer(self, joueur):
+        """Marque la route comme capturée par un joueur."""
+        self.possesseur = joueur
+        self.etat = "capturée"  # Change l'état de la route à "capturée"
 
 
 
