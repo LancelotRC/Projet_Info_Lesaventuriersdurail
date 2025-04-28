@@ -1,9 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-print("salut lancelot, moi c'est zach")
-
-
 # Création du graphe représentant les classes
 G = nx.DiGraph()
 
