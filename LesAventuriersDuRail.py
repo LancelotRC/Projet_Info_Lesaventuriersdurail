@@ -210,7 +210,7 @@ class Table:
     def capturer_route(self, joueur):
         """Permet à un joueur de capturer une route en défaussant les cartes nécessaires"""
         print("\nRoutes disponibles :")
-        routes_disponibles = [route for route in self.plateau.routes if route.dispo is None]
+        routes_disponibles = [route for route in self.plateau.routes if route.possesseur is None]
 
         if not routes_disponibles:
             print("Aucune route n'est disponible à capturer.")
@@ -242,7 +242,6 @@ class Table:
         self.defausser_cartes_wagon(joueur, route_choisie)
 
         # Marquer la route comme occupée
-        route_choisie.dispo = False
         route_choisie.possesseur = joueur
         joueur.routes_capturees.append(route_choisie)
         joueur.wagons_restants -= route_choisie.longueur
@@ -609,7 +608,6 @@ class Route:
         self.Ville2 = Ville2
         self.longueur = longueur
         self.couleur = couleur
-        self.dispo = None #(True si dispo False si occupée)
         self.possesseur = None
 
 

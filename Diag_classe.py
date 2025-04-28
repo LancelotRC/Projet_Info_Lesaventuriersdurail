@@ -5,26 +5,34 @@ import matplotlib.pyplot as plt
 G = nx.DiGraph()
 
 # Ajout des classes (noeuds)
-classes = ["Table", "Joueur", "CarteDefi", "CarteWagon",
-           "Pioche", "PiocheWagon", "PiocheItineraire",
-           "Plateau", "Itineraire", "Ville"]
+classes = [
+    "Table",
+    "Joueur",
+    "CarteWagon",
+    "CarteItineraire",
+    "PiocheWagon",
+    "PiocheItineraire",
+    "Plateau",
+    "Route",
+    "Ville"
+]
 
 G.add_nodes_from(classes)
 
 # Ajout des relations d'héritage (arêtes)
-heritage = [("Pioche", "PiocheWagon"),
-            ("Pioche", "PiocheItineraire")]
+heritage = []
 
 # Ajout des relations de composition (arêtes)
-composition = [("Table", "Joueur"),
-               ("Table", "Plateau"),
-               ("Table", "PiocheWagon"),
-               ("Table", "PiocheItineraire"),
-               ("Plateau", "Ville"),
-               ("Plateau", "Itineraire"),
-               ("Joueur", "CarteWagon"),
-               ("Joueur", "CarteDefi"),
-               ("Itineraire", "Ville")]
+composition = [
+    ("Table", "Joueur"),
+    ("Table", "Plateau"),
+    ("Table", "PiocheWagon"),
+    ("Table", "PiocheItineraire"),
+    ("Plateau", "Ville"),
+    ("Plateau", "Route"),
+    ("Joueur", "CarteWagon"),
+    ("Joueur", "CarteItineraire")
+]
 
 # Ajout des arêtes au graphe
 G.add_edges_from(heritage + composition)
