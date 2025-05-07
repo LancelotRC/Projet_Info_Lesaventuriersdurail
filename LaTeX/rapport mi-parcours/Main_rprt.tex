@@ -1,64 +1,319 @@
-%! Author = lalol
-%! Date = 24/03/2025
-
-
 \documentclass[a4paper,12pt]{report}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{geometry}
-\geometry{margin=2.5cm}
 \usepackage{graphicx}
+\usepackage{float}
+\usepackage{longtable}
 \usepackage{hyperref}
+\usepackage{listings}
 
-\title{Rapport de mi-parcours \\ \textbf{Projet Info}}
-\author{Zachary BARBON-EVIS \\ Lancelot RAMIS \\}
-\date{\today}
+\geometry{margin=2.5cm}
+\lstset{
+    basicstyle=\ttfamily\small,
+    frame=single,
+    language=Python,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{Rapport de Projet \\ \textbf{Les Aventuriers du Rail}}
+\author{Zachary BARBON-EVIS \\ Lancelot RAMIS}
+\date{10/05/2025}
+
 
 \begin{document}
 
 \maketitle
-
 \tableofcontents
-\newpage
 
-\chapter{Introduction}
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
 
-\section{Contexte et enjeux}
-Présentation détaillée du contexte du projet, motivations, enjeux technologiques ou scientifiques.
+%% ➤ Présenter le jeu Les Aventuriers du Rail.
+%% ➤ Situer le contexte pédagogique (modélisation, projet structuré, programmation objet).
+%% ➤ Énoncer les objectifs généraux du projet. [Voir le document avancement des objectifs]
 
-\section{Objectifs du projet}
-Énoncer clairement les objectifs visés par le projet.
+\chapter{Analyse du problème}
 
-\chapter{État actuel des travaux}
+\section{Définition exacte du problème}
+%% ➤ Simuler une partie simplifiée avec des joueurs, cartes, routes, objectifs, etc.
 
-\section{Travaux réalisés}
-Description précise des tâches accomplies jusqu’à présent, incluant éventuellement des illustrations,
-captures d'écran ou résultats intermédiaires.
+\section{Domaines d’utilisation}
+%% ➤ Aide au joueur humain, test de stratégie, expérimentation d’un joueur automatique, application pédagogique.
 
-\section{Difficultés rencontrées}
-Identifier et décrire les difficultés techniques ou organisationnelles apparues.
+\section{Limites et simplifications}
+%% ➤ Choix de ne pas implémenter certaines règles, simplifier les objectifs, fixer le nombre de joueurs...
 
-\chapter{Analyse intermédiaire}
+\chapter{Description du programme}
 
-\section{Résultats préliminaires}
-Présentation et interprétation des premiers résultats ou des premières expérimentations.
+\section{Organisation générale}
+%% ➤ Décrire le déroulement d’un tour de jeu : pioche, capture, passage au joueur suivant.
+%% ➤ Ajouter un schéma général du fonctionnement (à inclure en image).
 
-\section{Évaluation du planning initial}
-Analyse du respect du calendrier initialement fixé.
+\section{Diagramme de classes}
+%% ➤ Insérer le diagramme généré par PyCharm.
 
-\chapter{Prochaines étapes}
 
-\section{Planification à venir}
-Décrire précisément les étapes suivantes avec des jalons et dates estimées.
 
-\section{Axes d'amélioration}
-Décrire les améliorations à apporter à l'organisation, la méthodologie ou aux aspects techniques.
+\section{Classes principales}
 
-\chapter*{Conclusion intermédiaire}
-Synthèse des enseignements tirés à ce stade et ouverture sur les perspectives.
+Le projet repose sur une modélisation orientée objet fidèle à la structure du jeu Les Aventuriers du Rail.
+Les principales classes implémentées sont les suivantes :
+
+\subsection*{Classe \texttt{Table}}
+
+Cette classe coordonne la partie. Elle contient l’ensemble des objets nécessaires au déroulement du jeu :
+les joueurs, le plateau, les pioches (cartes wagon et cartes itinéraire), ainsi que la gestion des tours.
+C’est le point d’entrée principal de l’exécution du jeu.
+
+\begin{itemize}
+    \item Initialise les composants de la partie (joueurs, pioches, plateau, objectifs).
+    \item Gère le déroulement du jeu tour par tour.
+    \item Implémente les règles de pioche, de capture de route, et les contrôles de validité.
+\end{itemize}
+
+\subsection*{Classe \texttt{Joueur}}
+
+Un joueur est caractérisé par :
+\begin{itemize}
+    \item Un nom, un nombre de wagons disponibles.
+    \item Une main de cartes wagon et une main de cartes objectif.
+    \item Un score évolutif.
+\end{itemize}
+Le joueur interagit avec la table en piochant, en capturant des routes, et en remplissant ses objectifs.
+Des méthodes de jeu automatique seront ajoutées par la suite.
+
+\subsection*{Classe \texttt{Plateau}}
+
+Cette classe représente la carte du jeu, sous forme d’un graphe via \texttt{networkx}. Elle contient :
+\begin{itemize}
+    \item La liste des villes (sommets du graphe).
+    \item La liste des routes entre villes (arêtes, avec couleur et longueur).
+    \item Une méthode d'affichage graphique du plateau à l’aide de \texttt{matplotlib}.
+\end{itemize}
+Elle est utilisée pour déterminer les routes disponibles et afficher l’état du jeu.
+
+\subsection*{Classe \texttt{CarteWagon}}
+
+Cette classe modélise une carte de couleur (ou locomotive). Elle contient :
+\begin{itemize}
+    \item La couleur de la carte (ex : rouge, vert, locomotive, etc.
+\end{itemize}
+Elle est utilisée à la fois pour composer la pioche, la main des joueurs, et valider la prise de route.
+
+\subsection*{Classe \texttt{CarteItineraire}}
+
+Une carte objectif contient deux villes et une valeur en points. Elle est attribuée en début de partie.
+\begin{itemize}
+    \item Les villes sont à relier pour gagner les points.
+    \item Si l’objectif n’est pas rempli à la fin, les points sont perdus.
+\end{itemize}
+
+\subsection*{Classe \texttt{Ville}}
+
+Une ville est un nœud du graphe du plateau généralement définie par son nom et ses coordonnées graphiques.
+Elle est utilisée pour placer les routes sur le graphe et pour calculer les connexions.
+
+\subsection*{Classe \texttt{Route}}
+
+Une route est une liaison entre deux villes. Elle est caractérisée par :
+\begin{itemize}
+    \item Sa longueur (nombre de wagons nécessaires).
+    \item Sa couleur (ou gris pour n’importe quelle couleur).
+    \item Le joueur qui l’a capturée (ou \texttt{None} si encore disponible).
+\end{itemize}
+Elle est représentée par une arête dans le graphe du plateau.
+
+\subsection*{Classes \texttt{PiocheWagon} et \texttt{PiocheItineraire}}
+
+Ces deux classes gèrent respectivement les cartes wagon et les cartes objectif :
+\begin{itemize}
+    \item Tirage aléatoire.
+    \item Cartes visibles pour les wagons.
+    \item Règles de pioche (ex : interdiction de piocher une locomotive en 2\up{e} carte).
+\end{itemize}
+
+\vspace{1em}
+L’ensemble de ces classes interagit selon un principe de composition :
+chaque classe possède ses propres données et références vers les objets nécessaires
+(ex : \texttt{Table} contient une liste de \texttt{Joueur},une instance de \texttt{Plateau}, etc.).
+À ce jour, l’héritage est peu utilisé, mais la structure reste claire et modulaire.
+
+%% ➤ Décrire : jouer_tour, capturer_route, piocher_cartes_wagon, etc.
+%% ➤ Donner un extrait de code si pertinent.
+
+
+\section{Méthodes importantes}
+
+Certaines méthodes du projet jouent un rôle central dans le déroulement du jeu.
+Nous présentons ici celles qui participent directement à l'exécution des actions du joueur et à la mise à jour du plateau.
+
+\subsection*{\texttt{jouer\_tour(joueur)} — classe \texttt{Table}}
+
+Cette méthode coordonne un tour de jeu pour le joueur donné.
+Elle appelle selon les cas les fonctions de pioche ou de capture de route, puis actualise le plateau.
+Elle gère les règles suivantes :
+\begin{itemize}
+    \item Choix entre piocher ou capturer une route.
+    \item Interdiction de piocher une locomotive en deuxième carte.
+    \item Passage au joueur suivant.
+\end{itemize}
+
+\subsection*{\texttt{piocher\_cartes\_wagon(joueur)} — classe \texttt{Table}}
+
+Permet au joueur de piocher une ou deux cartes wagon. Elle intègre les règles du jeu :
+\begin{itemize}
+    \item Le joueur peut choisir parmi les cartes visibles ou tirer à l’aveugle.
+    \item Si la première carte est une locomotive visible, le joueur ne peut pas piocher une deuxième carte.
+    \item Si le joueur choisit une locomotive en deuxième carte, il est contraint de refaire un choix.
+\end{itemize}
+
+\subsection*{\texttt{capturer\_route(joueur)} — classe \texttt{Table}}
+
+Cette méthode permet à un joueur de capturer une route, c’est-à-dire :
+\begin{itemize}
+    \item Vérifier qu’il possède les cartes nécessaires.
+    \item Vérifier qu’il lui reste assez de wagons.
+    \item Retirer les cartes utilisées et décrémenter le stock de wagons.
+    \item Mettre à jour le plateau : la route devient indisponible et est associée au joueur.
+    \item Ajouter les points correspondant à la longueur de la route.
+\end{itemize}
+
+\subsection*{\texttt{afficher\_plateau\_graphique()} — classe \texttt{Plateau}}
+
+Affiche dynamiquement l’état du plateau avec les routes et les villes, en utilisant la bibliothèque \texttt{matplotlib}.
+Cette méthode est utile :
+\begin{itemize}
+    \item Pour visualiser les routes encore disponibles.
+    \item Pour observer les routes capturées par chaque joueur.
+    \item Pour intégrer une première forme d'IHM dans le projet.
+\end{itemize}
+
+\subsection*{Méthodes à venir}
+
+D'autres méthodes clés seront développées dans la suite du projet :
+\begin{itemize}
+    \item Calcul automatique des objectifs réussis (via composantes connexes).
+    \item Détection du plus long chemin (bonus de 10 points).
+    \item Gestion du joueur automatique.
+    \item Mise à jour des cartes visibles en cas d'excès de locomotives.
+\end{itemize}
+
+
+
+
+
+\chapter{Figures imposées}
+\addcontentsline{toc}{chapter}{Figures imposées}
+
+Le projet respecte plusieurs des figures imposées, réparties en deux catégories :
+les six figures communes à tous les sujets, et trois figures supplémentaires sélectionnées par le binôme.
+
+Nous listons ci-dessous ces figures, en distinguant celles qui sont clairement implémentées,
+celles qui restent à travailler, et celles qui ne sont pas pertinentes dans le cadre de notre projet.
+
+\section*{1. Figures imposées communes à tous les sujets}
+
+\begin{itemize}
+    \item \textbf{Création d’au moins quatre types d’objets avec variables d’instance} – \underline{Implémentée} \\
+    Le projet comprend les classes suivantes : \texttt{Table}, \texttt{Joueur}, \texttt{Plateau}, \texttt{CarteWagon},
+    \texttt{CarteItineraire}, \texttt{Ville}, \texttt{Route}.
+    Chacune dispose de plusieurs variables d’instance décrivant leur état propre.
+
+    \item \textbf{Structuration du code en plusieurs modules} – \underline{Partiellement implémentée} \\
+    Le code principal est actuellement regroupé dans un fichier unique
+    (\texttt{LesAventuriersDuRail.py}), mais un second module est dédié au diagramme de classes (\texttt{Diag\_classe.py}).
+    Une restructuration en plusieurs modules thématiques (cartes, joueurs, plateau, etc) est prévue pour la version finale.
+
+    \item \textbf{Héritage / composition entre au moins trois types} – \underline{Partiellement implémentée} \\
+    Le code repose principalement sur la \textbf{composition}
+    (ex. : \texttt{Table} contient un \texttt{Plateau}, des \texttt{Joueur}, des pioches, mais aucun héritage n'est actuellement utilisé.
+    Il n’y a pas de classe abstraite de type \texttt{Carte}, ou \texttt{Pioche}.
+    Cette figure sera retravaillée pour introduire un héritage minimal pertinent.
+
+    \item \textbf{Documentation et commentaires du code} – \underline{En cours} \\
+    Des docstrings explicatifs sont en cours d’ajout pour chaque classe et méthode.
+    Le champ \texttt{:author:} est prévu pour identifier les contributeurs.
+    Une documentation complète est prévue pour la livraison finale.
+
+    \item \textbf{Tests unitaires (au moins 4 méthodes, 2 cas chacune)} – \underline{À développer} \\
+    Les tests unitaires sont à formaliser.
+    Les fonctions clés (\texttt{piocher\_cartes\_wagon}, \texttt{capturer\_route}, etc.) ont été testées manuellement,
+    mais pas encore via un framework comme \texttt{pytest}.
+    Ce point sera prioritaire pour l’étape suivante.
+
+    \item \textbf{Stockage de données (fichier ou BDD)} – \underline{Non implémentée} \\
+    À ce jour, aucune lecture ou écriture de fichier n’est réalisée.
+    Cette figure ne semble pas essentielle dans notre sujet actuel, car la partie sauvegarde/chargement n’est pas exigée dans les objectifs pédagogiques.
+    Elle pourrait être utilisée en option pour mémoriser l’état du plateau ou une configuration.
+
+\end{itemize}
+
+\section*{2. Figures supplémentaires choisies pour le sujet}
+
+\begin{itemize}
+    \item \textbf{Algorithme d’optimisation} – \underline{À venir} \\
+    Un joueur intelligent (objectif 4) est prévu.
+    Il devra construire un sous-graphe reliant ses objectifs en minimisant le nombre d’arêtes ou de couleurs utilisées.
+    Cette tâche est liée à un problème d’arbre de Steiner et constitue un bon candidat pour l’optimisation.
+
+    \item \textbf{Fonction récursive} – \underline{Non encore utilisée} \\
+    Aucune fonction récursive n’est présente pour le moment.
+    Elle pourrait être introduite dans le calcul du plus long chemin (bonus de 10 points), via une exploration récursive du graphe de routes du joueur.
+
+    \item \textbf{Exploration de graphe avec bibliothèque dédiée} – \underline{Implémentée} \\
+    Le projet utilise \texttt{networkx} pour représenter et manipuler le graphe du plateau.
+    Cela inclut la détection des routes disponibles, la suppression d’arêtes, l’évaluation des composantes connexes.
+    Cette figure est donc clairement remplie.
+
+\end{itemize}
+
+\section*{3. Figures non pertinentes dans le cadre de ce projet}
+
+Les figures suivantes ne sont pas jugées pertinentes dans notre cas :
+
+\begin{itemize}
+    \item \textbf{Calcul vectoriel} : non applicable, car le projet ne traite pas de données vectorielles ou numériques en masse.
+    \item \textbf{Design patterns type}
+
+\end{itemize}
+
+\chapter{Tests et résultats}
+
+\section{Méthodes testées manuellement}
+%% ➤ Jouer un tour, piocher des cartes, capturer une route, attribution initiale…
+
+\section{Tests à implémenter}
+%% ➤ Tests unitaires avec pytest pour : piocher, capturer, fin de partie, erreur de joueur, etc.
+
+\chapter{Avancement des objectifs}
+
+%% ➤ Reprendre ici le tableau ou texte déjà rédigé avec Objectifs 1 à 4 + IHM.
+%% ➤ Dire ce qui est fait / partiel / à venir.
+
+\chapter{Perspectives et améliorations}
+
+%% ➤ Découpage du code en modules
+%% ➤ Implémentation du joueur aléatoire
+%% ➤ Calcul des scores (objectif + composante connexe)
+%% ➤ Plus long chemin
+%% ➤ Joueur intelligent avec graphe de routes
+%% ➤ Interface plus interactive (optionnelle)
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+%% ➤ Résumer ce qui est déjà fait
+%% ➤ Dire ce que vous avez appris techniquement
+%% ➤ Présenter les priorités pour la 2ᵉ étape
 
 \appendix
+
 \chapter{Annexes}
-Ajouter ici des éléments complémentaires comme du code, schémas techniques, ou données expérimentales.
+
+
+%% ➤ lien github, README, extrait de codes utiles,
 
 \end{document}

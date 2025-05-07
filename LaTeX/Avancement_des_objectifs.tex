@@ -1,0 +1,84 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+
+\title{Avancement des objectifs du projet \\ \textbf{Les Aventuriers du Rail}}
+\author{Zachary BARBON-EVIS \\ Lancelot RAMIS}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\chapter*{Avancement des objectifs}
+\addcontentsline{toc}{chapter}{Avancement des objectifs}
+
+Ce projet s'appuie sur quatre objectifs principaux décrits dans le cahier des charges. Ce chapitre fait le point sur l'état d'avancement de chacun d'eux, en mettant en évidence les éléments réalisés, partiellement réalisés ou non encore commencés.
+
+\section*{Objectif 1 – Aide au jeu pour un humain}
+
+\begin{itemize}
+    \item \textbf{Carte du jeu modélisée comme un graphe} : \textit{Réalisé} (avec \texttt{networkx}).
+    \item \textbf{Gestion des routes prises} : \textit{Réalisé}, avec mise à jour du graphe.
+    \item \textbf{Pioche de cartes wagon} : \textit{Fonctionnelle}, avec cartes visibles/cachées.
+    \item \textbf{Main des joueurs (wagons et objectifs)} : \textit{Initialisée automatiquement}.
+    \item \textbf{Stocks de wagons} : \textit{Réduits au fil de la partie}.
+    \item \textbf{Liste des coups possibles} : \textit{Partiellement réalisé}, non encore structurée explicitement.
+    \item \textbf{Mise à jour du plateau après chaque coup} : \textit{Opérationnelle}.
+    \item \textbf{Fin de partie détectée} : \textit{Non implémentée}.
+    \item \textbf{Défausse en cas de trop de locomotives visibles} : \textit{Non implémentée}.
+\end{itemize}
+
+\section*{Objectif 2 – Joueur aléatoire}
+
+\begin{itemize}
+    \item \textbf{Liste des coups valides} : \textit{Non formalisée}.
+    \item \textbf{Sélection aléatoire d’un coup} : \textit{Non implémentée}.
+    \item \textbf{Exécution automatique d’un tour} : \textit{Non implémentée}.
+\end{itemize}
+
+\section*{Objectif 3 – Calcul des points}
+
+\begin{itemize}
+    \item \textbf{Points pour les routes prises} : \textit{Implémentés dans \texttt{capturer\_route}}.
+    \item \textbf{Vérification des objectifs réalisés (composantes connexes)} : \textit{À faire}.
+    \item \textbf{Calcul du plus long chemin (bonus)} : \textit{Non implémenté}.
+\end{itemize}
+
+\section*{Objectif 4 – Joueur intelligent (IA tactique)}
+
+\begin{itemize}
+    \item \textbf{Arbre de routes pour relier les objectifs} : \textit{Non implémenté}.
+    \item \textbf{Réaction aux routes prises par d'autres joueurs} : \textit{Non implémenté}.
+    \item \textbf{Équilibrage des couleurs} : \textit{Non implémenté}.
+    \item \textbf{Comportement prudent / secret} : \textit{Non implémenté}.
+\end{itemize}
+
+\section*{Objectif 4 bis – Aide à l'humain (interface)}
+
+\begin{itemize}
+    \item \textbf{Affichage graphique du plateau} : \textit{Réalisé via \texttt{matplotlib}}.
+    \item \textbf{Indication des objectifs atteints} : \textit{Non implémentée}.
+    \item \textbf{Alertes sur les routes critiques} : \textit{Non implémentées}.
+    \item \textbf{Évaluation de la faisabilité d’un objectif (Dijkstra)} : \textit{Non implémentée}.
+\end{itemize}
+
+\section*{Tests et validations}
+
+\begin{itemize}
+    \item \textbf{Plateau USA implémenté} : \textit{Utilisé comme terrain principal}.
+    \item \textbf{Plateaux simplifiés (arbre, graphe complet, toutes routes grises)} : \textit{À créer pour tests ciblés}.
+    \item \textbf{Mode de test avec 1 seul joueur} : \textit{Possible mais non automatisé}.
+\end{itemize}
+
+\section*{Synthèse}
+
+À ce stade, l’objectif 1 est globalement atteint dans ses grandes lignes. L’objectif 3 est partiellement engagé. Les objectifs 2 et 4 (joueurs automatique et intelligent) constituent les prochaines étapes clés du développement.
+
+\end{document}
