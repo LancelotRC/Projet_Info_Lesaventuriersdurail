@@ -1,8 +1,15 @@
+#region === Imports ===
+
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+from collections import Counter
 
-# definition des données pour le jeu version USA
+#endregion
+
+#region === definition des données pour le jeu version USA ===
 
 # Définition des villes du plateau USA
 VILLES_USA = {
@@ -138,8 +145,6 @@ ROUTES_USA = [
     ("Washington", "Pittsburgh", "grey", 2),
 ]
 
-
-
 # Définition des cartes destination (Ville1, Ville2, points)
 CARTES_DESTINATION_USA = [
     ("Los Angeles", "New York", 21), ("Duluth", "Houston", 8), ("Chicago", "New Orleans", 7),
@@ -153,7 +158,9 @@ CARTES_DESTINATION_USA = [
     ("Seattle", "New York", 22), ("San Francisco", "New Orleans", 20), ("Kansas City", "Montreal", 13),
     ("Denver", "Chicago", 7), ("Boston", "Miami", 12), ("Chicago", "Los Angeles", 16)
 ]
+#endregion
 
+#region === Classes principales ===
 
 # Classe principale regroupant tout
 class Table:
@@ -162,6 +169,7 @@ class Table:
         self.plateau = Plateau(VILLES_USA, ROUTES_USA)
         self.pioche_wagon = PiocheWagon([CarteWagon(c) for c in ["red", "blue", "green", "yellow", "black", "white", "orange", "pink"] * 12 + ["locomotive"] * 14])
         self.pioche_itineraire = PiocheItineraire([CarteItineraire(v1, v2, p) for v1, v2, p in CARTES_DESTINATION_USA])
+        self.score = 0
 
     def initialiser_partie(self):
         """Distribue les cartes de départ aux joueurs avec restriction de repose à une seule carte maximum."""
@@ -180,17 +188,24 @@ class Table:
     def jouer_tour(self, joueur):
         """Permet à un joueur de jouer son tour avec validation stricte"""
         while True:
+
             print(f"\n{joueur.nom}, c'est votre tour !")
-            print(f"Wagons restants : {joueur.wagons_restants}")
-            print(f"Cartes wagon en main : {[c.couleur for c in joueur.cartes_wagon]}")
-            print(f"Cartes destination : {[f'{c.ville_depart} → {c.ville_arrivee}' for c in joueur.cartes_defi]}")
+            # Compter les occurrences des couleurs dans les cartes du joueur
+            couleurs_cartes = Counter(c.couleur for c in joueur.cartes_wagon)
+
+            # Afficher les cartes avec leur fréquence
+            print("Voici vos cartes wagon :")
+            for couleur, count in couleurs_cartes.items():
+                print(f"{couleur}: {count}")
+            print("Voici vos cartes destination :", [f"{c.ville_depart} → {c.ville_arrivee}" for c in joueur.cartes_defi])
+            print(f"Nombre de wagons restants : {joueur.wagons_restants}")
 
             print("1. Piocher une carte wagon")
             print("2. Capturer une route")
             print("3. Piocher des cartes destination")
-            print("4. Quitter le jeu")
-
-            choix = input("Choisissez une action (1, 2, 3, 4) : ")
+            print("4. afficher le plateau")
+            print("5. Quitter le jeu")
+            choix = input("Choisissez une action (1, 2, 3, 4, 5) : ")
 
             if choix == "1":
                 self.piocher_cartes_wagon(joueur)
@@ -202,19 +217,22 @@ class Table:
                 self.piocher_cartes_itineraire(joueur)
                 break
             elif choix == "4":
+                self.plateau.afficher_plateau_graphique()
+                break
+            elif choix == "5":
                 print("Fin de la partie. Merci d'avoir joué !")
                 exit()
             else:
-                print("❌ Choix invalide. Veuillez entrer 1, 2, 3 ou 4.")
+                print("choix invalide, veuiller reessayer")
 
     def capturer_route(self, joueur):
         """Permet à un joueur de capturer une route en défaussant les cartes nécessaires"""
         print("\nRoutes disponibles :")
-        routes_disponibles = [route for route in self.plateau.routes if route.possesseur is None]
+        routes_disponibles = [route for route in self.plateau.routes if route.possesseur is None and joueur.verifier_cartes_wagon(route)]
 
         if not routes_disponibles:
             print("Aucune route n'est disponible à capturer.")
-            return
+            return False
 
         # Afficher les routes disponibles
         for i, route in enumerate(routes_disponibles):
@@ -224,19 +242,9 @@ class Table:
 
         if choix < 0 or choix >= len(routes_disponibles):
             print("Choix invalide.")
-            return
+            return False
 
         route_choisie = routes_disponibles[choix]
-
-        # Vérifier que le joueur a assez de wagons
-        if joueur.wagons_restants < route_choisie.longueur:
-            print("Vous n'avez pas assez de wagons pour capturer cette route.")
-            return
-
-        # Vérifier que le joueur a les bonnes cartes wagon
-        if not joueur.verifier_cartes_wagon(route_choisie):
-            print("Vous n'avez pas les cartes nécessaires pour capturer cette route.")
-            return
 
         # Défausser les cartes utilisées
         self.defausser_cartes_wagon(joueur, route_choisie)
@@ -250,6 +258,7 @@ class Table:
         self.plateau.afficher_plateau_graphique()  # Mise à jour visuelle du plateau
 
         print(f"{joueur.nom} a capturé la route {route_choisie.Ville1} → {route_choisie.Ville2}!")
+        return True
 
     def defausser_cartes_wagon(self, joueur, route):
         """Défausse les cartes utilisées pour capturer une route"""
@@ -277,30 +286,35 @@ class Table:
 
     def piocher_cartes_wagon(self, joueur):
         """Gère la pioche de cartes wagon pour un joueur"""
-        cartes_piochees = []
+        cartes_piochees, Loco = [], False
 
-        # Affichage des cartes visibles
-        print("\nCartes disponibles :")
-        for i, carte in enumerate(self.pioche_wagon.visible):
-            print(f"{carte.couleur}")
-        # Premier tirage
-        carte1, pioche = self.choisir_carte_wagon()
-        if not carte1:
-            print("Aucune carte n'a pu être piochée.")
-            return
-        joueur.cartes_wagon.append(carte1)
-        print(f"{joueur.nom}, vous avez choisi la carte {carte1.couleur}")
+        while Loco or len(cartes_piochees) <2 :
 
-        # Vérifier si c'était une locomotive → Pas de deuxième pioche
-        if carte1.is_locomotive and pioche == 1:
-            print(f"{joueur.nom} a pioché une locomotive et ne peut pas prendre de deuxième carte. Fin du tour.")
-            return  # ✅ Arrêt immédiat
+            # Affichage des cartes visibles
+            print("\nCartes disponibles :")
+            for i, carte in enumerate(self.pioche_wagon.visible):
+                print(f"{carte.couleur}")
+            # Premier tirage
+            carte1, pioche = self.choisir_carte_wagon()
+            if not carte1:
+                print("Aucune carte n'a pu être piochée.")
+                return
+            cartes_piochees.append(carte1)
+            joueur.cartes_wagon.append(carte1)
+            print(f"{joueur.nom}, vous avez choisi la carte {carte1.couleur}")
 
-        # Deuxième tirage
-        carte2 = self.choisir_carte_wagon(interdit_locomotive=True)[0]
-        joueur.cartes_wagon.append(carte2)
+            # Vérifier si c'était une locomotive → Pas de deuxième pioche
+            if carte1.is_locomotive and pioche == 1:
+                print(f"{joueur.nom} a pioché une locomotive et ne peut pas prendre de deuxième carte. Fin du tour.")
+                Loco = True
+                return  # ✅ Arrêt immédiat
 
-        print(f"{joueur.nom}, vous avez pioché : {carte1.couleur, carte2.couleur}")
+            # Deuxième tirage
+            carte2 = self.choisir_carte_wagon(interdit_locomotive=True) [0]
+            cartes_piochees.append(carte2)
+            joueur.cartes_wagon.append(carte2)
+
+            print(f"{joueur.nom}, vous avez pioché : {carte1.couleur, carte2.couleur}")
 
     def choisir_carte_wagon(self, interdit_locomotive=False):
         """Permet au joueur de choisir une carte visible ou cachée avec validation stricte"""
@@ -366,6 +380,9 @@ class Table:
 
             # Permettre une deuxième repose seulement si au moins 2 cartes restent
             if len(piochees) > 1:
+                for i, carte in enumerate(piochees):
+                    print("voici les cartes destination qui vous restent :")
+                    print(f"{i + 1}: {carte.ville_depart} → {carte.ville_arrivee} ({carte.points} points)")
                 choix2 = input("Voulez-vous reposer une autre carte ? (0 = non, sinon 1 ou 2) : ")
                 if choix2 in ["1", "2"]:
                     cartes_a_reposer.append(piochees.pop(int(choix2) - 1))  # Repose une deuxième carte
@@ -386,6 +403,64 @@ class Table:
         print("\nCartes visibles :")
         for i, carte in enumerate(self.pioche_wagon.visible, start=1):  # ✅ Numérotation commence à 1
             print(f"{i}: {carte.couleur}")
+
+    def compte_des_points(self):
+        print("\n=== Bilan des scores ===")
+
+        for joueur in self.joueurs:
+
+            points_routes = joueur.calculer_points_routes()
+            points_objectifs = joueur.calculer_points_destinations()
+            total = points_routes + points_objectifs
+
+            print(f"{joueur.nom} :")
+            if joueur == self.joueur_plus_longue_route() :
+                print(f"{joueur.nom} remporte le bonus de la route la plus longue.")
+                total += 10
+
+            print(f"  Points routes : {points_routes}")
+            print(f"  Points objectifs : {points_objectifs}")
+            print(f"  Score total : {total}\n")
+
+    def joueur_plus_longue_route(self):
+        """Retourne le joueur ayant la plus longue route (sans passer deux fois par la même ville)"""
+
+
+        def plus_long_chemin(joueur):
+            G = self.plateau.sous_graphe_joueur(joueur)
+            max_longueur = 0
+
+            # DFS à partir de chaque sommet
+            for ville in G.nodes:
+                visited = set()
+                stack = [(ville, 0, visited)]
+
+                while stack:
+                    current, longueur, visited = stack.pop()
+                    visited.add(current)
+                    max_longueur = max(max_longueur, longueur)
+
+                    for voisin in G.neighbors(current):
+                        if voisin not in visited:
+                            stack.append((voisin, longueur + 1, visited.copy()))
+
+            return max_longueur
+
+        meilleurs = []
+        max_val = -1
+
+        for joueur in self.joueurs:
+            longueur = plus_long_chemin(joueur)
+            if longueur > max_val:
+                meilleurs = [joueur]
+                max_val = longueur
+            elif longueur == max_val:
+                meilleurs.append(joueur)
+
+        if len(meilleurs) == 1:
+            return meilleurs[0]
+        else:
+            return None  # égalité
 
 
 # Classe représentant un joueur
@@ -482,11 +557,14 @@ class Joueur:
                     points -= destination.points
             return points
 
+#endregion
 
+#region === Classes Cartes ===
+
+# Classe regroupant les différentes cartes
 class Carte:
     def __str__(self):
         return "Carte"
-
 
 # Classe représentant les cartes wagon
 class CarteWagon(Carte):
@@ -508,15 +586,20 @@ class CarteItineraire(Carte):
     def __str__(self):
         return f"{self.ville_depart} → {self.ville_arrivee} ({self.points} points)"
 
+#endregion
+
+#region === Classes Pioches ===
+
+# Classe regroupant les différentes pioches
 class Pioche:
     def __init__(self, cartes):
         self.pioche = cartes  # Liste des cartes wagon
         random.shuffle(self.pioche)
 
-
 # Classe représentant la pioche des cartes Wagon
 class PiocheWagon(Pioche):
     def __init__(self, cartes):
+        super().__init__(cartes)
         self.visible = [self.pioche.pop() for _ in range(5)]  # 5 cartes visibles
         self.defausse = []
 
@@ -568,6 +651,8 @@ class PiocheWagon(Pioche):
 
 # Classe représentant la pioche de cartes itinéraires
 class PiocheItineraire(Pioche):
+    def __init__(self, cartes):
+        super().__init__(cartes)
 
     def piocher(self):
         """Pioche trois cartes destination."""
@@ -577,12 +662,91 @@ class PiocheItineraire(Pioche):
         """Replace les cartes non gardées en bas de la pioche."""
         self.pioche = cartes + self.pioche
 
+#endregion
+
+#region === Classes Plateau ===
+
 # Classe représentant le plateau de jeu (toutes les villes et les routes)
 class Plateau:
     def __init__(self, dico_ville, dico_route):
         self.villes = [Ville(nom, coordonnees=dico_ville[nom]) for nom in dico_ville]
-        self.routes = [Route(V1, V2, couleur, longueur) for V1, V2, couleur, longueur in dico_route]  # ✅ Convertit en objets Route
+        self.dico_villes = {ville.nom: ville for ville in self.villes}
+        self.routes = [Route(self.dico_villes[V1], self.dico_villes[V2], couleur, longueur) for V1, V2, couleur, longueur in dico_route]
         self.afficher_plateau_graphique()
+
+    def double(self, route):
+        """Renvoie True si une autre route relie les mêmes villes (dans un sens ou dans l’autre)"""
+        v1, v2 = route.Ville1.nom, route.Ville2.nom
+
+        for autre in self.routes:
+            if autre is route:
+                continue
+            # comparer sans tenir compte de l'ordre
+            villes = {autre.Ville1.nom, autre.Ville2.nom}
+            if {v1, v2} == villes:
+                return True
+
+        return False
+
+    def sous_graphe_joueur(self, joueur):
+        G = nx.Graph()
+        for route in self.routes:  # toutes les routes du plateau
+            if route.possesseur == joueur:
+                G.add_edge(route.Ville1.nom, route.Ville2.nom)
+        return G
+
+    def afficher_plateau_graphique_rect(self): #ebauche de visualisation des routes avec des rectangles
+        plt.figure(figsize=(12, 8))
+
+        for ville in self.villes:
+            x, y = ville.coordonnees
+            plt.plot(x, y, 'o', color='black')
+            plt.text(x, y + 0.3, ville.nom, ha='center', fontsize=8)
+
+        for route in self.routes:
+            x1, y1 = route.Ville1.coordonnees
+            x2, y2 = route.Ville2.coordonnees
+
+            dx, dy = x2 - x1, y2 - y1
+            L = np.sqrt(dx ** 2 + dy ** 2)
+            ux, uy = dx / L, dy / L  # vecteur direction unitaire
+            px, py = -uy * 0.2, ux * 0.2  # vecteur perpendiculaire pour double route
+
+            # Couleur de la bordure (route) et remplissage
+            border_color = route.couleur
+            fill_color = "white" if route.possesseur is None else route.possesseur.couleur
+
+            # Décalage si route double
+            offset = (px, py) if getattr(route, "double", False) else (0, 0)
+
+            # Tracer les wagons
+            wagon_length = 0.025  # en unité normalisée, pour un plateau [0, 1]
+            wagon_height = 0.012
+
+            total_wagon_length = wagon_length * route.longueur
+            gap = (L - total_wagon_length) / (route.longueur + 1)
+
+            for i in range(route.longueur):
+                d = gap * (i + 1) + wagon_length * i + wagon_length / 2
+                cx = x1 + d * ux + offset[0]
+                cy = y1 + d * uy + offset[1]
+
+                angle = np.degrees(np.arctan2(dy, dx))
+                rect = patches.Rectangle(
+                    (cx - wagon_length / 2, cy - wagon_height / 2),
+                    wagon_length,
+                    wagon_height,
+                    angle=angle,
+                    linewidth=2.5,
+                    edgecolor=border_color,
+                    facecolor=fill_color
+                )
+                plt.gca().add_patch(rect)
+
+        plt.axis('equal')
+        plt.axis('off')
+        plt.title("Plateau des Aventuriers du Rail — affichage par wagons")
+        plt.show()
 
     def afficher_plateau_graphique(self):
         G = nx.Graph()
@@ -617,7 +781,6 @@ class Plateau:
         plt.title("Plateau des Aventuriers du Rail (Version USA)")
         plt.show()
 
-
 # Classe représentant une ville
 class Ville:
     def __init__(self, nom, coordonnees=None):
@@ -626,6 +789,7 @@ class Ville:
 
 # Classe représentant une route entre deux villes
 class Route:
+
     def __init__(self, Ville1, Ville2, couleur, longueur):
         self.Ville1 = Ville1
         self.Ville2 = Ville2
@@ -633,16 +797,10 @@ class Route:
         self.couleur = couleur
         self.possesseur = None
         self.etat = "disponible"  # Par défaut, la route est disponible
-    
+
     def capturer(self, joueur):
         """Marque la route comme capturée par un joueur."""
         self.possesseur = joueur
         self.etat = "capturée"  # Change l'état de la route à "capturée"
 
-
-
-## lancer le jeu
-
-## ajouter le joueur aléatoire
-## comptage des points
-## graphique pour le plateau
+#endregion
