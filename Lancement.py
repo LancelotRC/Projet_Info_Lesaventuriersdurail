@@ -1,13 +1,13 @@
 from LesAventuriersDuRail import *
-from collections import Counter
 
 
 if __name__ == "__main__":
     print("\n=== Lancement manuel du jeu Les Aventuriers du Rail ===")
 
     # Création des joueurs
-    joueurs = [Joueur("Alice", "rouge"), Joueur("Bob", "bleu")]
+    joueurs = [Joueur("Alice", "rouge"), Joueur("Bob", "bleu"), Joueur("David", "Jaune")]
     table = Table(joueurs)
+
     
     #creation du plateau 
     plateau = Plateau(VILLES_USA,ROUTES_USA)
@@ -27,40 +27,26 @@ if __name__ == "__main__":
     # Début de la partie (chaque joueur joue à tour de rôle)
     print("\n=== Début de la partie ===")
     tour = 1
+    dernier_joueur = None
+    dernier_tour = False
     while True:
         print(f"\n--- Tour {tour} ---")
         for joueur in joueurs:
-            
-            print(f"\n{joueur.nom}, c'est votre tour !")
-            # Compter les occurrences des couleurs dans les cartes du joueur
-            couleurs_cartes = Counter(c.couleur for c in joueur.cartes_wagon)
+            if dernier_tour and joueur == dernier_joueur:
+                print(f"{joueur.nom} a déclenché la fin de partie au tour précédent.")
+                print("Fin du jeu.")
+                break  # On quitte la boucle for
 
-            # Afficher les cartes avec leur fréquence
-            print("Voici vos cartes wagon :")
-            for couleur, count in couleurs_cartes.items():
-                print(f"{couleur}: {count}")
+            table.jouer_tour(joueur)
 
-            print("Voici vos cartes destination :", [f"{c.ville_depart} → {c.ville_arrivee}" for c in joueur.cartes_defi])
-            
-            print("1. Piocher une carte wagon")
-            print("2. Capturer une route")
-            print("3. Piocher des cartes destination")
-            print("4. afficher le plateau")
-            print("5. Quitter le jeu")
-            choix = input("Choisissez une action (1, 2, 3, 4, 5) : ")
+            if joueur.wagons_restants <=2 and not dernier_tour :
+                dernier_joueur = joueur
+                dernier_tour = True
+                print(f"{joueur.nom} a {joueur.wagons_restants} wagons ou moins.")
+                print("Dernier tour pour les autres joueurs.")
+        else :
+            tour += 1
+            continue
 
-            if choix == "1":
-                table.piocher_cartes_wagon(joueur)
-            elif choix == "2":
-                table.capturer_route(joueur)
-            elif choix == "3":
-                table.piocher_cartes_itineraire(joueur)
-            elif choix == "4":
-                plateau.afficher_plateau_graphique()
-            elif choix == "5":
-                print("Fin de la partie. Merci d'avoir joué !")
-                exit()
-            else:
-                print("Choix invalide, veuillez réessayer.")
-
-        tour += 1
+        break
+    Table.compte_des_points()
