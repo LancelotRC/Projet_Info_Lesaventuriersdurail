@@ -31,30 +31,177 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-%% ➤ Présenter le jeu Les Aventuriers du Rail.
-%% ➤ Situer le contexte pédagogique (modélisation, projet structuré, programmation objet).
-%% ➤ Énoncer les objectifs généraux du projet. [Voir le document avancement des objectifs]
+\textit{Les Aventuriers du Rail} est un jeu de société stratégique dans lequel les joueurs collectent des cartes pour
+construire des lignes de chemin de fer entre des villes d’un continent. Chaque joueur tente de remplir des objectifs
+secrets tout en bloquant, si possible, les adversaires. Le jeu repose sur la prise de décisions tactiques,
+la gestion de ressources, et une vision globale du plateau.
+
+Dans le cadre de notre formation en informatique, ce projet a pour but de traduire ces mécaniques ludiques en une
+architecture logicielle modulaire et cohérente. Il constitue une application concrète de la programmation orientée objet,
+de la modélisation par diagrammes de classes, et de la structuration de projet.
+Il s’inscrit également dans une démarche progressive, où l’on passe d’un modèle de jeu manuel à une simulation
+automatique puis intelligente, tout en respectant des contraintes de clarté, de testabilité et d’extensibilité du code.
+
+Le projet repose sur plusieurs objectifs pédagogiques :
+\begin{itemize}
+    \item Mettre en place une modélisation complète du jeu : carte, routes, joueurs, cartes wagon et cartes objectif.
+    \item Déterminer et implémenter les actions possibles à chaque tour, en respectant les règles du jeu.
+    \item Proposer un joueur automatique, d’abord aléatoire, puis optimisé pour chercher à atteindre ses objectifs.
+    \item Calculer les scores en prenant en compte les objectifs réalisés, les routes posées et le plus long chemin.
+    \item (Optionnel) Améliorer l'expérience utilisateur avec une aide au jeu, une IHM graphique ou des alertes intelligentes.
+\end{itemize}
+
+Ce rapport présente l’état actuel de l’avancement, la structure générale du programme, les principales classes et méthodes,
+ainsi que les perspectives pour la suite du développement.
 
 \chapter{Analyse du problème}
 
 \section{Définition exacte du problème}
-%% ➤ Simuler une partie simplifiée avec des joueurs, cartes, routes, objectifs, etc.
+
+Le projet consiste à modéliser informatiquement une version simplifiée du jeu de société \textit{Les Aventuriers du Rail}.
+Il s'agit de simuler le déroulement d'une partie à l'aide d'une modélisation orientée objet, en respectant les règles de base du jeu original.
+
+Le cœur du problème réside dans la mise en place d'une structure de données représentant :
+\begin{itemize}
+    \item la carte du jeu (un graphe dont les sommets sont des villes et les arêtes sont les routes disponibles) ;
+    \item les joueurs, chacun possédant un stock de wagons, des cartes wagon, et des objectifs à remplir ;
+    \item les actions possibles à chaque tour : piocher des cartes wagon, capturer une route, ou éventuellement choisir
+    de nouveaux objectif (option désactivée pour le joueur automatique dans notre simplification) ;
+    \item les règles du jeu, notamment les contraintes de pioche, la capture de routes grises
+    (par n'importe quelle couleur), et la limitation à deux actions maximum par tour ;
+    \item la mise à jour du plateau à chaque action, avec vérification de la fin de partie.
+\end{itemize}
+
+Le système doit également permettre d’attribuer les cartes d’objectifs et de wagon en début de partie,
+de déterminer les coups possibles à chaque tour et de les exécuter, tout en assurant le suivi du score.
+
+En plus de cette modélisation du jeu pour un joueur humain, le projet intègre une logique de joueur automatique
+(aléatoire ou intelligent) permettant de tester plus rapidement les mécaniques.
+Enfin, le calcul des scores repose sur des structures de graphe : composantes connexes pour la vérification des objectifs,
+et algorithme de parcours pour identifier le plus long chemin.
+
+Ce projet a donc pour but de fournir une simulation fidèle, évolutive et testable du jeu, en mettant l'accent sur
+une organisation modulaire et une structuration orientée objet claire.
 
 \section{Domaines d’utilisation}
-%% ➤ Aide au joueur humain, test de stratégie, expérimentation d’un joueur automatique, application pédagogique.
+
+Le programme développé a vocation à être utilisé dans plusieurs contextes pédagogiques ou expérimentaux.
+
+\begin{itemize}
+    \item \textbf{Aide au joueur humain} : en simulant la partie, le programme peut rappeler les objectifs en cours,
+    les routes encore disponibles, ou avertir lorsqu’un objectif devient difficile voir impossible à atteindre.
+    Des fonctionnalités supplémentaires pourront également conseiller des actions possibles à un joueur réel.
+
+    \item \textbf{Test de stratégie} : en comparant les performances de joueurs automatisés avec des comportements
+    différents (aléatoire, optimisé, prudent, etc.), le programme permet d’analyser l'efficacité de différentes
+    stratégies sur un même plateau.
+
+    \item \textbf{Expérimentation d’un joueur automatique} : une première version aléatoire du joueur permet de tester
+    les règles du jeu. À terme, l’intégration d’un joueur intelligent ouvre la voie à des travaux sur l’optimisation,
+    la recherche de chemins, et l’intelligence artificielle rudimentaire.
+
+    \item \textbf{Application pédagogique} : le projet illustre de nombreux concepts de l’enseignement en informatique :
+    modélisation par classes, graphe orienté, algorithmes de parcours, règles de gestion, tests unitaires,
+    documentation, et structuration en modules.
+\end{itemize}
 
 \section{Limites et simplifications}
-%% ➤ Choix de ne pas implémenter certaines règles, simplifier les objectifs, fixer le nombre de joueurs...
+
+Afin de rendre le projet plus accessible et réalisable dans un cadre pédagogique limité,
+plusieurs simplifications ont été mises en place :
+
+\begin{itemize}
+    \item \textbf{Pas de sélection des objectifs} : chaque joueur reçoit trois cartes itinéraire qu’il est contraint de
+    garder. L’action de tirer de nouveaux objectifs en cours de partie a été retirée pour les joueurs automatiques.
+
+    \item \textbf{Trois joueurs fixes} : le nombre de joueurs est limité à trois pour éviter la complexité du
+    multijoueur complet tout en conservant la richesse d’interaction entre joueurs.
+
+    \item \textbf{Pas de routes doubles} : lorsqu’une route propose deux couleurs dans la version réelle du jeu, seule
+    l’une est disponible. Cela évite de devoir gérer les graphes complexe. (pour la création du plateau de jeu, le graph
+    comporte pour le moment 2 fleches)
+
+    \item \textbf{Pas d’interface graphique complète} : une visualisation simple du graphe du plateau est proposée via
+    \texttt{matplotlib}, mais aucune interface interactive n’est encore amorcée.
+
+    \item \textbf{Aucune sauvegarde de partie} : le programme ne propose ni chargement, ni sauvegarde.
+    Chaque exécution correspond à une partie unique. Cependant cette option reste envisageable et envisagée.
+
+    \item \textbf{Calcul des scores partiellement implémenté} : les scores liés aux routes capturées sont pris en compte.
+    Le calcul des points liés aux objectifs ou au plus long chemin est encore en développement.
+\end{itemize}
+
+Ces choix permettent de concentrer l’effort sur la mécanique de base du jeu, tout en préparant le terrain pour une
+extension ultérieure pour la fin du projet.
 
 \chapter{Description du programme}
 
 \section{Organisation générale}
-%% ➤ Décrire le déroulement d’un tour de jeu : pioche, capture, passage au joueur suivant.
-%% ➤ Ajouter un schéma général du fonctionnement (à inclure en image).
+
+Le déroulement d'une partie suit les grandes étapes classiques du jeu \textit{Les Aventuriers du Rail},
+adaptées ici dans une version simplifiée et pilotée par un contrôleur central (la classe \texttt{Table}).
+
+\subsection*{Mise en place}
+
+Au lancement du programme :
+\begin{itemize}
+    \item Le plateau de jeu est initialisé (chargement des villes et routes à partir d'une structure pré-définie en début de programme).
+    \item Trois joueurs sont créés et reçoivent chacun un nombre initial de wagons (45), trois cartes objectif, et quatre cartes wagon.
+    \item Les cartes wagon visibles sont tirées et affichées (cinq cartes).
+\end{itemize}
+
+\subsection*{Déroulement d’un tour de jeu}
+
+Chaque tour, le joueur actif a le choix entre deux actions principales :
+\begin{itemize}
+    \item \textbf{Piocher des cartes wagon} :
+        \begin{itemize}
+            \item Il peut piocher deux cartes, visibles ou cachées.
+            \item Si la première carte est une locomotive visible, le tour se termine immédiatement.
+            \item Si la deuxième carte sélectionnée est une locomotive visible, les règles interdisant ce choix,
+            un nouveau choix lui est demandé.
+        \end{itemize}
+    \item \textbf{Capturer une route} :
+        \begin{itemize}
+            \item Il sélectionne une route disponible.
+            \item Il doit disposer du bon nombre de cartes wagon de la couleur correspondante (ou Locomotives/jokers).
+            \item S’il possède les cartes requises et assez de wagons, il prend la route,
+            sinon on lui demande de refaire un autre choix.
+            \item Son score est mis à jour en fonction de la longueur de la route.
+        \end{itemize}
+    \item \textbf{Piocher une carte objectif} (non accessible au joueur auto):
+        \begin{itemize}
+            \item Il pioche 3 cartes de la pioche correspondante.
+            \item Il choisit de garder une à 3 cartes et repose les autres le cas échéant.
+        \end{itemize}
+\end{itemize}
+
+Après son action, le tour passe au joueur suivant. La partie continue ainsi jusqu'à ce qu'un joueur ait deux wagons
+ou moins, déclenchant le dernier tour.
+
+\subsection*{Schéma général du fonctionnement}
+
+Un schéma synthétique peut représenter cette logique :
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{graph_logique}
+    \caption{Schéma du déroulement d’un tour de jeu}
+    \label{fig:tour_de_jeu}
+\end{figure}
+
+\noindent Ce schéma illustre les choix possibles à chaque tour et les principales conditions vérifiées avant de poursuivre.
+
+
 
 \section{Diagramme de classes}
-%% ➤ Insérer le diagramme généré par PyCharm.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagramme_classe}
+    \caption{Diagramme de classe}
+    \label{fig:diagramme_classe}
+\end{figure}
 
 
 \section{Classes principales}
@@ -141,9 +288,6 @@ chaque classe possède ses propres données et références vers les objets néc
 (ex : \texttt{Table} contient une liste de \texttt{Joueur},une instance de \texttt{Plateau}, etc.).
 À ce jour, l’héritage est peu utilisé, mais la structure reste claire et modulaire.
 
-%% ➤ Décrire : jouer_tour, capturer_route, piocher_cartes_wagon, etc.
-%% ➤ Donner un extrait de code si pertinent.
-
 
 \section{Méthodes importantes}
 
@@ -200,8 +344,6 @@ D'autres méthodes clés seront développées dans la suite du projet :
     \item Gestion du joueur automatique.
     \item Mise à jour des cartes visibles en cas d'excès de locomotives.
 \end{itemize}
-
-
 
 
 

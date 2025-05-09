@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
+\beamer@sectionintoc {2}{État d'avancement actuel}{4}{0}{2}
+\beamer@sectionintoc {3}{Prochaines étapes}{5}{0}{3}
+\beamer@sectionintoc {4}{Questions}{6}{0}{4}

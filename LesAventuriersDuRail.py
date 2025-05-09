@@ -478,8 +478,14 @@ class Joueur:
                     points -= destination.points
             return points
 
+
+class Carte:
+    def __str__(self):
+        return "Carte"
+
+
 # Classe représentant les cartes wagon
-class CarteWagon:
+class CarteWagon(Carte):
     def __init__(self, couleur):
         self.couleur = couleur
         self.is_locomotive = (couleur == "locomotive")  # Ajout d’un flag pour éviter des vérifications de texte
@@ -488,7 +494,7 @@ class CarteWagon:
         return f"Carte Wagon ({self.couleur})"
 
 # Classe représentant les cartes itinéraire
-class CarteItineraire:
+class CarteItineraire(Carte):
     def __init__(self, ville_depart, ville_arrivee, points):
         self.ville_depart = ville_depart
         self.ville_arrivee = ville_arrivee
@@ -498,11 +504,15 @@ class CarteItineraire:
     def __str__(self):
         return f"{self.ville_depart} → {self.ville_arrivee} ({self.points} points)"
 
-# Classe représentant la pioche des cartes Wagon
-class PiocheWagon:
+class Pioche:
     def __init__(self, cartes):
         self.pioche = cartes  # Liste des cartes wagon
         random.shuffle(self.pioche)
+
+
+# Classe représentant la pioche des cartes Wagon
+class PiocheWagon(Pioche):
+    def __init__(self, cartes):
         self.visible = [self.pioche.pop() for _ in range(5)]  # 5 cartes visibles
         self.defausse = []
 
@@ -552,10 +562,7 @@ class PiocheWagon:
             print(f"DEBUG: Nouvelle pioche visible après correction: {[c.couleur for c in self.visible]}")
 
 # Classe représentant la pioche de cartes itinéraires
-class PiocheItineraire:
-    def __init__(self, cartes):
-        self.pioche = cartes  # Liste des cartes destination
-        random.shuffle(self.pioche)
+class PiocheItineraire(Pioche):
 
     def piocher(self):
         """Pioche trois cartes destination."""
