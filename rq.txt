@@ -1,0 +1,36 @@
+si c'est gris, j'aimerai choisir quelle couleur j'utilise
+lorsque on acquiert une route, choisir quels wagons utiliser
+
+Si je n'ai pas les cartes nécessaires, je veux pouvoir retourner en arrière automatiquement sur le choix à faire.
+
+si on repose une carte dest on réaffiche les cartes entrain d'etres choisir
+
+
+rechoisir après faux choix
+si un choix est invalide, redonner la main à celui qui vient de faire le mauvais choix
+
+
+je n'arrive pas à capturer une route
+
+
+
+--- en cours ---
+
+actualiser l'affichage du plateau avec les routes occupés (état occupé ou libre), et leur longueur
+possiblement choisir 5 pour actualiser la carte.
+
+
+
+--- réalisé ---
+28/04/25:
+
+problème des 3 locomotives
+
+on affiche regulièrement les cartes du joueur pour qui c'est le tour
+print les cartes possédés par le joueur au début de son tour. et modifier la présentation en mettant "nb x couleur"
+
+ajout d'un état capturé dans Route et début de méthode capturer
+
+modification de plateau pour les routes capturées (style/ couleur/ affichage)
+L'état capturé fonctionne car la route[0] est en pointillé
+Mais la capture n'est pas réussi
