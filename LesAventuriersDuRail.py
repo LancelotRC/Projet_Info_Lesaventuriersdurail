@@ -210,7 +210,7 @@ class Table:
     def capturer_route(self, joueur):
         """Permet à un joueur de capturer une route en défaussant les cartes nécessaires"""
         print("\nRoutes disponibles :")
-        routes_disponibles = [route for route in self.plateau.routes if route.possesseur is None]
+        routes_disponibles = [route for route in self.plateau.routes if route.possesseur is None and joueur.verifier_cartes_wagon(route)]
 
         if not routes_disponibles:
             print("Aucune route n'est disponible à capturer.")
