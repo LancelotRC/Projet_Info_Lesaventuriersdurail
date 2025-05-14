@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.25)  9 MAY 2025 13:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.25)  12 MAY 2025 17:57
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -476,12 +476,12 @@ Chapitre 2.
 [5
 
 ]
-<graph_logique.png, id=134, 1806.75pt x 1204.5pt>
+<graph_logique.png, id=129, 1806.75pt x 1204.5pt>
 File: graph_logique.png Graphic file (type png)
 <use graph_logique.png>
 Package pdftex.def Info: graph_logique.png  used on input line 188.
 (pdftex.def)             Requested size: 409.71692pt x 273.13278pt.
-<diagramme_classe.png, id=136, 1505.625pt x 1304.875pt>
+<diagramme_classe.png, id=131, 1505.625pt x 1304.875pt>
 File: diagramme_classe.png Graphic file (type png)
 <use diagramme_classe.png>
 Package pdftex.def Info: diagramme_classe.png  used on input line 201.
@@ -492,19 +492,18 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
  [7 <./diagramme_classe.png>] [8] [9] [10]
 Chapitre 3.
 
-Overfull \hbox (67.19357pt too wide) in paragraph at lines 367--371
-\T1/cmr/m/n/12 Le code prin-ci-pal est ac-tuel-le-ment re-groupé dans un fi-chi
-er unique (\T1/cmtt/m/n/12 LesAventuriersDuRail.py\T1/cmr/m/n/12 ),
+Underfull \hbox (badness 10000) in paragraph at lines 366--367
+
  []
 
 
-Overfull \hbox (14.1078pt too wide) in paragraph at lines 372--377
-[]\T1/cmr/bx/n/12 Héritage / com-po-si-tion entre au moins trois types \T1/cmr/
-m/n/12 ^^U $[]$ 
+Overfull \hbox (90.68921pt too wide) in paragraph at lines 368--369
+[]\T1/cmr/m/n/12 Le code prin-ci-pal est ac-tuel-le-ment re-groupé dans un fi-c
+hier unique : (\T1/cmtt/m/n/12 LesAventuriersDuRail.py\T1/cmr/m/n/12 ). 
  []
 
 
-Overfull \hbox (5.28232pt too wide) in paragraph at lines 372--377
+Overfull \hbox (5.28232pt too wide) in paragraph at lines 376--380
 \T1/cmr/m/n/12 Le code re-pose prin-ci-pa-le-ment sur la \T1/cmr/bx/n/12 com-po
 -si-tion \T1/cmr/m/n/12 (ex. : \T1/cmtt/m/n/12 Table \T1/cmr/m/n/12 contient un
  \T1/cmtt/m/n/12 Plateau\T1/cmr/m/n/12 ,
@@ -514,21 +513,32 @@ Overfull \hbox (5.28232pt too wide) in paragraph at lines 372--377
 
 ] [12]
 Chapitre 4.
+
+Overfull \hbox (145.12993pt too wide) in paragraph at lines 459--460
+[]\T1/cmr/m/n/12 Vérification que la pioche vi-sible ne contient pas trois lo-c
+o-mo-tives (\T1/cmtt/m/n/12 verifier_visibles_sans_3_locomotives\T1/cmr/m/n/12 
+). 
+ []
+
 [13
 
-]
+] [14]
 Chapitre 5.
-[14
-
-]
-Chapitre 6.
 [15
 
-] [16
+] [16]
+Chapitre 6.
+[17
+
+] [18] [19
 
 ]
-Annexe A.
-[17
+Overfull \hbox (65.26067pt too wide) in paragraph at lines 641--642
+[]\T1/cmr/m/n/12 Projet Gi-tHub as-so-cié : \T1/cmtt/m/n/12 https://github.com/
+LancelotRC/Projet_Info_Lesaventuriersdurail 
+ []
+
+[20
 
 ]
 (C:/Users\lalol\OneDrive\Documents\Scolaire\1A ENSTA B\UE2.1-Projet_Info\Projet
@@ -538,36 +548,37 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `Main_rprt.out' has not changed.
-(rerunfilecheck)             Checksum: 9C29D461E827698FAC8D945CE866F65A;2956.
+(rerunfilecheck)             Checksum: F13B808FD4B928B7B27497AA22139213;2913.
  ) 
 Here is how much of TeX's memory you used:
- 12701 strings out of 474486
- 205069 string characters out of 5743755
+ 12717 strings out of 474486
+ 205220 string characters out of 5743755
  1934542 words of memory out of 5000000
- 34780 multiletter control sequences out of 15000+600000
- 572191 words of font info for 63 fonts, out of 8000000 for 9000
+ 34777 multiletter control sequences out of 15000+600000
+ 572442 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,6n,79p,387b,546s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm
-0800.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
-0\ectt1440.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
-/dpi600\eccc1200.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
-pen/ec/dpi600\ecbx1440.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour
-/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/
-ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fon
-ts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\lalol\AppData\Local\MiKT
-eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\lalol\AppData\Loca
-l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\lalol\AppDat
-a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk> <C:\Users\lalol\
-AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\Users\
-lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2074.pk> <C:\
-Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2074.pk
->
+ 75i,6n,79p,387b,548s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbi
+1728.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
+0\ecit1200.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
+/dpi600\ectt1440.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
+pen/ec/dpi600\eccc1200.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour
+/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/
+ljfour/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\lalol\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\lalol\AppData\Local\MiKT
+eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\lalol\AppData\Loca
+l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\lalol\AppDat
+a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\lalol\
+AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk> <C:\Users\
+lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk> <C:\
+Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2074.pk
+> <C:\Users\lalol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm2
+074.pk>
 Output written on "C:/Users\lalol\OneDrive\Documents\Scolaire\1A ENSTA B\UE2.1-
-Projet_Info\Projet_Info_Lesaventuriersdurail\out\Main_rprt.pdf" (18 pages, 3708
-29 bytes).
+Projet_Info\Projet_Info_Lesaventuriersdurail\out\Main_rprt.pdf" (21 pages, 4184
+19 bytes).
 PDF statistics:
- 638 PDF objects out of 1000 (max. 8388607)
- 58 named destinations out of 1000 (max. 500000)
- 163 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 756 PDF objects out of 1000 (max. 8388607)
+ 76 named destinations out of 1000 (max. 500000)
+ 155 words of extra memory for PDF output out of 10000 (max. 10000000)
 

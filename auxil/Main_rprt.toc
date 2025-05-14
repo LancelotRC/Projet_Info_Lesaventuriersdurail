@@ -13,8 +13,7 @@
 \contentsline {chapter}{Figures imposées}{11}{chapter.3}%
 \contentsline {chapter}{\numberline {4}Tests et résultats}{13}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Méthodes testées manuellement}{13}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Tests à implémenter}{13}{section.4.2}%
-\contentsline {chapter}{\numberline {5}Avancement des objectifs}{14}{chapter.5}%
-\contentsline {chapter}{\numberline {6}Perspectives et améliorations}{15}{chapter.6}%
-\contentsline {chapter}{Conclusion}{16}{chapter*.22}%
-\contentsline {chapter}{\numberline {A}Annexes}{17}{appendix.A}%
+\contentsline {section}{\numberline {4.2}Tests unitaires automatisés}{13}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Avancement des objectifs}{15}{chapter.5}%
+\contentsline {chapter}{\numberline {6}Perspectives et améliorations}{17}{chapter.6}%
+\contentsline {chapter}{Conclusion}{19}{chapter*.35}%
