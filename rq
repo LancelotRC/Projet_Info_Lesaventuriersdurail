@@ -7,3 +7,7 @@ rechoisir après faux choix
 si on repose une carte dest on réaffiche les cartes entrain d'etres choisir
 
 on affiche regulièrement les cartes du joueur pour qui c'est le tour
+
+16/05 :
+Les joueurs auto vident la pioche de carte donc ne posent pas assez de cartes. il faut les contraindre à poser leur
+cartes wagon quand ils ont vidé la pioche. Il faudrait même préferer poser des cartes wagon plutot que d'en piocher.
