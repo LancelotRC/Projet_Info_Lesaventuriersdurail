@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-
+from collections import Counter
 from LesAventuriersDuRail import * # Import du jeu
 
 
@@ -156,6 +156,34 @@ class TestCapturerRoute(unittest.TestCase):
         self.table.capturer_route(self.joueur)
 
         self.assertNotEqual(self.route.possesseur, self.joueur)  # La route ne doit pas être capturée
+
+class TestVerifierCartesWagon(unittest.TestCase):
+    def setUp(self):
+        self.joueur = Joueur("Test", "bleu")
+
+    def test_route_coloree_suffisante(self):
+        route = Route("Chicago", "Saint Louis", "red", 3)
+        self.joueur.cartes_wagon = [CarteWagon("red") for _ in range(2)] + [CarteWagon("locomotive")]
+        self.assertTrue(self.joueur.verifier_cartes_wagon(route))
+
+    def test_route_coloree_insuffisante(self):
+        route = Route("Chicago", "Saint Louis", "red", 4)
+        self.joueur.cartes_wagon = [CarteWagon("red") for _ in range(2)] + [CarteWagon("locomotive")]
+        self.assertFalse(self.joueur.verifier_cartes_wagon(route))
+
+    def test_route_grise_suffisante(self):
+        route = Route("Chicago", "Saint Louis", "gris", 3)
+        self.joueur.cartes_wagon = [CarteWagon("blue")] * 2 + [CarteWagon("locomotive")]
+        self.assertTrue(self.joueur.verifier_cartes_wagon(route))
+
+    def test_route_grise_insuffisante(self):
+        route = Route("Chicago", "Saint Louis", "gris", 4)
+        self.joueur.cartes_wagon = [CarteWagon("green")] + [CarteWagon("locomotive")]
+        self.assertFalse(self.joueur.verifier_cartes_wagon(route))
+
+if __name__ == "__main__":
+    unittest.main()
+
 
 
 if __name__ == '__main__':

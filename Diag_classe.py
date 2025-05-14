@@ -1,62 +1,109 @@
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 
-print("salut lancelot, moi c'est zach")
-
-
-# Création du graphe représentant les classes
+# Création du graphe orienté
 G = nx.DiGraph()
 
-# Ajout des classes (noeuds)
+# Liste des classes
 classes = [
-    "Table",
-    "Joueur",
-    "CarteWagon",
-    "CarteItineraire",
-    "PiocheWagon",
-    "PiocheItineraire",
-    "Plateau",
-    "Route",
-    "Ville"
+    "Table", "Joueur", "Carte", "CarteWagon", "CarteItineraire",
+    "Pioche", "PiocheWagon", "PiocheItineraire", "Plateau", "Route", "Ville"
 ]
-
 G.add_nodes_from(classes)
 
-# Ajout des relations d'héritage (arêtes)
-heritage = []
-
-# Ajout des relations de composition (arêtes)
-composition = [
-    ("Table", "Joueur"),
-    ("Table", "Plateau"),
-    ("Table", "PiocheWagon"),
-    ("Table", "PiocheItineraire"),
-    ("Plateau", "Ville"),
-    ("Plateau", "Route"),
-    ("Joueur", "CarteWagon"),
-    ("Joueur", "CarteItineraire")
+# Relations
+heritage = [
+    ("PiocheWagon", "Pioche"),
+    ("PiocheItineraire", "Pioche"),
+    ("CarteWagon", "Carte"),
+    ("CarteItineraire", "Carte")
 ]
-
-# Ajout des arêtes au graphe
+composition = [
+    ("Table", "Joueur"), ("Table", "Plateau"),
+    ("Table", "PiocheWagon"), ("Table", "PiocheItineraire"),
+    ("Plateau", "Ville"), ("Plateau", "Route"),
+    ("PiocheWagon", "CarteWagon"), ("PiocheItineraire", "CarteItineraire"),
+    ("Joueur", "CarteWagon"), ("Joueur", "CarteItineraire")
+]
 G.add_edges_from(heritage + composition)
 
-# Définition du layout du graphe
-pos = nx.spring_layout(G)
+# Positions manuelles
+pos = {
+    "Table": (0, 0),
+    "Plateau": (-2.5, -1), "Ville": (-3.5, -2), "Route": (-1.5, -2),
+    "Joueur": (2.5, -1), "CarteWagon": (2, -2.2), "CarteItineraire": (3, -2.2),
+    "Carte": (2.5, -3.2),
+    "PiocheWagon": (-1, 1), "PiocheItineraire": (1, 1), "Pioche": (0, 2)
+}
 
-# Dessin du graphe
-plt.figure(figsize=(12, 8))
-nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=2500, font_size=10, font_weight='bold', arrows=True)
+# Couleurs
+node_colors = []
+for node in G.nodes():
+    if node == "Pioche":
+        node_colors.append("violet")
+    elif node == "Carte":
+        node_colors.append("lightblue")
+    elif node.startswith("Pioche"):
+        node_colors.append("violet")
+    elif node.startswith("Carte"):
+        node_colors.append("skyblue")
+    elif node in ["Ville", "Route"]:
+        node_colors.append("lightgreen")
+    elif node == "Plateau":
+        node_colors.append("gold")
+    elif node == "Joueur":
+        node_colors.append("orange")
+    elif node == "Table":
+        node_colors.append("salmon")
+    else:
+        node_colors.append("lightyellow")
 
-# Ajout des étiquettes spécifiques pour les relations
-edge_labels = {}
-for edge in heritage:
-    edge_labels[edge] = 'hérite'
-for edge in composition:
-    edge_labels[edge] = 'contient'
+# Edge labels
+edge_labels = {edge: "hérite" for edge in heritage}
+edge_labels.update({edge: "contient" for edge in composition})
 
-nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red')
+# Tracé
+plt.figure(figsize=(15, 13))
+ax = plt.gca()
 
-# Afficher le graphe
-plt.title("Diagramme de Classes - Aventuriers du Rail")
+# Tracer les arêtes avec style conditionnel et labels intégrés
+for u, v in G.edges():
+    # Déterminer si la flèche doit être courbée
+    if (u, v) in [("PiocheWagon", "CarteWagon"), ("PiocheItineraire", "CarteItineraire")]:
+        style = "arc3,rad=0.3"
+    else:
+        style = "arc3,rad=0"
+
+    # Tracer la flèche
+    ax.annotate("",
+                xy=pos[v], xycoords='data',
+                xytext=pos[u], textcoords='data',
+                arrowprops=dict(arrowstyle='-|>',
+                                color='gray',
+                                shrinkA=15, shrinkB=15,
+                                connectionstyle=style))
+
+    # Tracer le label
+    label = edge_labels.get((u, v), "")
+    if label:
+        x_src, y_src = pos[u]
+        x_dst, y_dst = pos[v]
+        x_mid, y_mid = (x_src + x_dst) / 2, (y_src + y_dst) / 2
+        if (u, v) == ("PiocheWagon", "CarteWagon"):
+            ax.text(x_mid - 0.5, y_mid - 0.6, label, fontsize=9, color='red', ha='center')
+        elif (u, v) == ("PiocheItineraire", "CarteItineraire"):
+            ax.text(x_mid - 0.5, y_mid - 0.6, label, fontsize=9, color='red', ha='center')
+        elif (u, v) == ("Table", "Joueur"):
+            ax.text(x_mid*0.5, y_mid*0.5 + 0.1 , label, fontsize=9, color='red', ha='center')
+        elif (u, v) == ("Table", "Plateau"):
+            ax.text(x_mid * 1.5, y_mid * 1.5 + 0.1, label, fontsize=9, color='red', ha='center')
+        else:
+            ax.text(x_mid, y_mid + 0.1, label, fontsize=9, color='red', ha='center')
+
+# Tracer les nœuds et labels
+nx.draw_networkx_nodes(G, pos, node_size=3000, node_color=node_colors, ax=ax)
+nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold', ax=ax)
+
+plt.title("Diagramme de classes – flèches courbes et labels intégrés", fontsize=14, fontweight='bold')
 plt.axis('off')
 plt.show()

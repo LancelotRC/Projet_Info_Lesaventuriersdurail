@@ -4,7 +4,7 @@ if __name__ == "__main__":
     print("\n=== Lancement manuel du jeu Les Aventuriers du Rail ===")
 
     # Création des joueurs
-    joueurs = [Joueur("Alice", "red"), Joueur("Bob", "blue")]#, Joueur("David", "Jaune")]
+    joueurs = [JoueurAuto("Alice", "red"), JoueurAuto("Bob", "blue")]#, JoueurAuto("David", "Jaune")]
     table = Table(joueurs)
 
     
@@ -36,7 +36,12 @@ if __name__ == "__main__":
                 print("Fin du jeu.")
                 break  # On quitte la boucle for
 
-            table.jouer_tour(joueur)
+            if isinstance(joueur, JoueurAuto):
+                print(f"{joueur.nom} est un joueur automatique.")
+                joueur.jouer_automatiquement(table)
+            else:
+                print(f"{joueur.nom} n'est pas un joueur automatique.")
+                table.jouer_tour(joueur)
 
             if joueur.wagons_restants <=2 and not dernier_tour :
                 dernier_joueur = joueur
