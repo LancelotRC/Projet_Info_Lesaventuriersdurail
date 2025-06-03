@@ -1,0 +1,182 @@
+Diagramme textuel des classes (attributs + méthodes)
+Table
+Attributs :
+
+joueurs
+
+plateau : Plateau
+
+pioche_wagon : PiocheWagon
+
+pioche_itineraire : PiocheItineraire
+
+score
+
+Méthodes :
+
+initialiser_partie()
+
+jouer_tour(joueur)
+
+capturer_route(joueur)
+
+defausser_cartes_wagon(joueur, route)
+
+piocher_cartes_wagon(joueur)
+
+choisir_carte_wagon(interdit_locomotive=False)
+
+piocher_cartes_itineraire(joueur)
+
+afficher_cartes_visibles()
+
+afficher_routes_disponibles()
+
+compte_des_points()
+
+joueur_plus_longue_route()
+
+Joueur
+Attributs :
+
+nom
+
+couleur
+
+routes_capturees
+
+cartes_wagon
+
+cartes_defi
+
+wagons_restants
+
+Méthodes :
+
+choisir_cartes_itineraire(cartes, initialisation=False)
+
+verifier_cartes_wagon(route)
+
+calculer_points_routes()
+
+villes_reliees(ville_depart, ville_arrivee)
+
+calculer_points_destinations()
+
+afficher_son_graphe()
+
+JoueurAuto (hérite de Joueur)
+Méthodes supplémentaires :
+
+jouer_automatiquement(table)
+
+repond_automatiquement(prompt)
+
+choisir_action()
+
+Carte (classe mère)
+Méthodes :
+
+__str__()
+
+CarteWagon(Carte)
+Attributs :
+
+couleur
+
+is_locomotive
+
+Méthodes :
+
+__str__()
+
+CarteItineraire(Carte)
+Attributs :
+
+ville_depart
+
+ville_arrivee
+
+points
+
+possesseur
+
+Méthodes :
+
+__str__()
+
+Pioche
+Attributs :
+
+pioche
+
+PiocheWagon(Pioche)
+Attributs :
+
+visible
+
+defausse
+
+Méthodes :
+
+piocher_visible(index)
+
+piocher_cachee()
+
+defausser(carte)
+
+remelanger_si_vide()
+
+verifier_visibles_sans_3_locomotives()
+
+PiocheItineraire(Pioche)
+Méthodes :
+
+piocher()
+
+replacer_en_bas(cartes)
+
+Plateau
+Attributs :
+
+villes : list[Ville]
+
+dico_villes : dict[str, Ville]
+
+routes : list[Route]
+
+Méthodes :
+
+double(route)
+
+sous_graphe_joueur(joueur)
+
+afficher_plateau_graphique()
+
+afficher_plateau_graphique_()
+
+Ville
+Attributs :
+
+nom
+
+coordonnees
+
+Route
+Attributs :
+
+Ville1 : Ville
+
+Ville2 : Ville
+
+longueur
+
+couleur
+
+possesseur
+
+etat
+
+Méthodes :
+
+capturer(joueur)

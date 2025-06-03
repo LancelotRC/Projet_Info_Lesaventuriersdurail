@@ -8,6 +8,18 @@
 \usepackage{longtable}
 \usepackage{hyperref}
 \usepackage{listings}
+\usepackage{tikz}
+\usepackage[pages=some]{background}
+
+
+%--------------------------------------------------------
+% Couleurs de la charte ENSTA
+%--------------------------------------------------------
+\definecolor{bleuENSTA}{HTML}{002A4B}
+\definecolor{corailENSTA}{HTML}{F05A28}
+\definecolor{grisENSTA}{gray}{0.3}
+
+
 
 \geometry{margin=2.5cm}
 \lstset{
@@ -24,6 +36,20 @@
 
 
 \begin{document}
+\backgroundsetup{
+  scale=1,
+  angle=0,
+  opacity=0.5,
+  contents={
+    \begin{tikzpicture}[remember picture, overlay]
+      \shade[inner color=bleuENSTA!60, outer color=white]
+        (current page.north west) circle (20cm);
+      \shade[inner color=bleuENSTA!60, outer color=white]
+        (current page.south east) circle (25cm);
+    \end{tikzpicture}
+  }
+}
+\BgThispage
 
 \maketitle
 \tableofcontents
@@ -358,7 +384,7 @@ celles qui restent à travailler, et celles qui ne sont pas pertinentes dans le 
 \section*{1. Figures imposées communes à tous les sujets}
 
 \begin{itemize}
-    \item \textbf{Création d’au moins quatre types d’objets avec variables d’instance} – \underline{Implémentée} \\
+    \item \textbf{Création d’au moins quatre types d’objets avec variables d’instance} – \textit{Implémentée} \\
     Le projet comprend les classes suivantes : \texttt{Table}, \texttt{Joueur}, \texttt{Plateau}, \texttt{CarteWagon},
     \texttt{CarteItineraire}, \texttt{Ville}, \texttt{Route}.
     Chacune dispose de plusieurs variables d’instance décrivant leur état propre.
@@ -378,17 +404,17 @@ celles qui restent à travailler, et celles qui ne sont pas pertinentes dans le 
     (ex. : \texttt{Table} contient un \texttt{Plateau}, des \texttt{Joueur}, des \texttt{Pioches} contenant elle-même,
     des \texttt{Cartes}. Ces deux dernierent sont garante d'une notion d'héritage minimaliste dans le code.
 
-    \item \textbf{Documentation et commentaires du code} – \underline{En cours} \\
+    \item \textbf{Documentation et commentaires du code} – \textit{En cours} \\
     Des docstrings explicatifs sont en cours d’ajout pour chaque classe et méthode.
     Le fichier \texttt{README.md} ainsi que le GitHub permet une vue globale du projet et de son
     avancement/fonctionnement. Une documentation complète de ces derniers est prévue pour la livraison finale.
 
-    \item \textbf{Tests unitaires (au moins 4 méthodes, 2 cas chacune)} – \underline{À développer} \\
+    \item \textbf{Tests unitaires (au moins 4 méthodes, 2 cas chacune)} – \textit{À développer} \\
     Les tests unitaires sont à formaliser.
     Les fonctions clés (\texttt{piocher\_cartes\_wagon}, \texttt{capturer\_route}, etc.) ont été testées via le module
     \texttt{Tests.py}. Ce point est décrit dans un chapitre dédié du rapport.
 
-    \item \textbf{Stockage de données (fichier ou BDD)} – \underline{Non implémentée} \\
+    \item \textbf{Stockage de données (fichier ou BDD)} – \textit{Non implémentée} \\
     À ce jour, aucune lecture ou écriture de fichier n’est réalisée.
     Cette figure ne semble pas essentielle dans notre sujet actuel, car la partie sauvegarde/chargement n’est pas exigée
     dans les objectifs pédagogiques. Cependant, elle pourrait être implémentée en option pour mémoriser l’état du
@@ -399,19 +425,19 @@ celles qui restent à travailler, et celles qui ne sont pas pertinentes dans le 
 \section*{2. Figures supplémentaires choisies pour le sujet}
 
 \begin{itemize}
-    \item \textbf{Algorithme d’optimisation} – \underline{À venir} \\
+    \item \textbf{Algorithme d’optimisation} – \textit{À venir} \\
     Un joueur intelligent (objectif 4) est prévu.
     Il devra construire un sous-graphe reliant ses objectifs en minimisant le nombre d’arêtes ou de couleurs utilisées.
     Cette tâche est liée à un problème d’arbre de Steiner et constitue un bon candidat pour l’optimisation.
     L'algorithme de Dijkstra est aussi une piste envisagée pour connaitre le chemin le plus intéressant pour l'aide au
     jeu ou pour le joueur intelligent.
 
-    \item \textbf{Fonction récursive} – \underline{Non encore utilisée} \\
+    \item \textbf{Fonction récursive} – \textit{Non encore utilisée} \\
     Une fonction récursive pourrait être introduite dans le calcul du plus long chemin (bonus de 10 points),
     via une exploration récursive du graphe de routes du joueur.
     Pour le moment, la methode choisie est celle du point suivant.
 
-    \item \textbf{Exploration de graphe avec bibliothèque dédiée} – \underline{Implémentée} \\
+    \item \textbf{Exploration de graphe avec bibliothèque dédiée} – \textit{Implémentée} \\
     Le projet utilise \texttt{networkx} pour représenter et manipuler le graphe du plateau.
     Cela inclut la détection des routes disponibles, la suppression d’arêtes, l’évaluation des composantes connexes.
     Cette figure est donc clairement plus qu'abordée.

@@ -71,6 +71,7 @@ class TestPiocheCartesWagon(unittest.TestCase):
         self.joueur = Joueur("Alice", "rouge")
         self.table = Table([self.joueur])
 
+
     @patch('builtins.input', return_value="1")
     def test_piocher_cartes_wagon_simple(self, mock_input):
         """Test : Le joueur pioche 2 cartes normales."""
@@ -80,16 +81,26 @@ class TestPiocheCartesWagon(unittest.TestCase):
 
         self.assertEqual(cartes_apres - cartes_avant, 2)  # ✅ Vérifier que 2 cartes ont été ajoutées
 
-    @patch('builtins.input', return_value="1")
+    @patch('builtins.input', side_effect=["2", "1"])
     def test_piocher_cartes_wagon_locomotive_premiere(self, mock_input):
         """Test : Si la première carte est une locomotive, le joueur ne pioche pas de deuxième carte."""
-        self.table.pioche_wagon.pioche.insert(0, CarteWagon("locomotive"))  # Force une loco en première carte
+
+        # Remplace la pioche par une version totalement contrôlée
+        self.table.pioche_wagon.pioche = ["rouge"]  # vide
+        self.table.pioche_wagon.visible = [
+            CarteWagon("bleu"),
+            CarteWagon("rouge"),
+            CarteWagon("locomotive"),
+            CarteWagon("vert"),
+            CarteWagon("noir"),
+        ]
+        self.table.pioche_wagon.defausse = []
 
         cartes_avant = len(self.joueur.cartes_wagon)
         self.table.piocher_cartes_wagon(self.joueur)
         cartes_apres = len(self.joueur.cartes_wagon)
 
-        self.assertEqual(cartes_apres - cartes_avant, 1)  # ✅ Vérifier qu'une seule carte a été ajoutée
+        self.assertEqual(cartes_apres - cartes_avant, 1)
 
     @patch('builtins.input', side_effect=["1", "1"])  # Première carte normale, tentative de loco, puis autre choix valide
     def test_piocher_cartes_wagon_interdit_locomotive_deuxieme(self, mock_input):
@@ -109,7 +120,7 @@ class TestPiocheCartesWagon(unittest.TestCase):
     @patch('builtins.input', return_value="1")
     def test_piocher_cartes_wagon_pioche_vide(self, mock_input):
         """Test : Vérifier que la défausse est mélangée si la pioche est vide."""
-        self.table.pioche_wagon.pioche.clear()
+        self.table.pioche_wagon.pioche = []
         self.table.pioche_wagon.defausse = [CarteWagon("bleu"), CarteWagon("rouge")]
 
         cartes_avant = len(self.joueur.cartes_wagon)
@@ -161,31 +172,27 @@ class TestVerifierCartesWagon(unittest.TestCase):
     def setUp(self):
         self.joueur = Joueur("Test", "bleu")
 
-    def test_route_coloree_suffisante(self):
+    def test_route_coloree(self):
         route = Route("Chicago", "Saint Louis", "red", 3)
         self.joueur.cartes_wagon = [CarteWagon("red") for _ in range(2)] + [CarteWagon("locomotive")]
         self.assertTrue(self.joueur.verifier_cartes_wagon(route))
-
-    def test_route_coloree_insuffisante(self):
-        route = Route("Chicago", "Saint Louis", "red", 4)
-        self.joueur.cartes_wagon = [CarteWagon("red") for _ in range(2)] + [CarteWagon("locomotive")]
+        self.joueur.cartes_wagon = [CarteWagon("red")] + [CarteWagon("locomotive")]
         self.assertFalse(self.joueur.verifier_cartes_wagon(route))
-
-    def test_route_grise_suffisante(self):
-        route = Route("Chicago", "Saint Louis", "gris", 3)
-        self.joueur.cartes_wagon = [CarteWagon("blue")] * 2 + [CarteWagon("locomotive")]
+        self.joueur.cartes_wagon = [CarteWagon("blue") for _ in range(3)] + [CarteWagon("locomotive")]
+        self.assertFalse(self.joueur.verifier_cartes_wagon(route))
+        self.joueur.cartes_wagon = [CarteWagon("red") for _ in range(6)] + [CarteWagon("locomotive")]
         self.assertTrue(self.joueur.verifier_cartes_wagon(route))
-
-    def test_route_grise_insuffisante(self):
+    def test_route_grise_suffisante(self):
         route = Route("Chicago", "Saint Louis", "gris", 4)
+        self.joueur.cartes_wagon = [CarteWagon("blue")] * 3 + [CarteWagon("locomotive")]
+        self.assertTrue(self.joueur.verifier_cartes_wagon(route))
+        self.joueur.cartes_wagon = [CarteWagon("blue")] * 3 + [CarteWagon("white")]*5 + [CarteWagon("locomotive")]*4
+        self.assertTrue(self.joueur.verifier_cartes_wagon(route))
+        self.joueur.cartes_wagon = [CarteWagon("red")] + [CarteWagon("blue")] + [CarteWagon("locomotive")]
+        self.assertFalse(self.joueur.verifier_cartes_wagon(route))
         self.joueur.cartes_wagon = [CarteWagon("green")] + [CarteWagon("locomotive")]
         self.assertFalse(self.joueur.verifier_cartes_wagon(route))
 
 if __name__ == "__main__":
-    unittest.main()
-
-
-
-if __name__ == '__main__':
     unittest.main()
 
