@@ -7,17 +7,15 @@ import matplotlib.patches as patches
 import numpy as np
 from collections import Counter
 import builtins
-
 import json
 import sys
-
+from PIL import Image
+from matplotlib import image as mpimg
 
 #endregion
 
 #region === definition des données pour le jeu version USA ===
-
-# Définition des villes du plateau USA
-VILLES_USA = {
+VILLES_USA_normalised = {
     "Atlanta": (0.62, 0.35),
     "Boston": (0.88, 0.80),
     "Calgary": (0.15, 0.95),
@@ -52,108 +50,152 @@ VILLES_USA = {
     "Seattle": (0.07, 0.95),
     "Toronto": (0.77, 0.80),
     "Vancouver": (0.05, 0.97),
+    "Winnipeg": (0.38, 0.94),
     "Washington": (0.78, 0.65),
-    "Winnipeg": (0.38,0.94),
 }
+
+# Définition des villes du plateau USA
+VILLES_USA = {
+    "Atlanta": (594, 327),
+    "Boston": (725,107),
+    "Calgary": (177,70),
+    "Charleston": (667,332),
+    "Chicago": (519, 211),
+    "Dallas": (420, 401),
+    "Denver": (296, 284),
+    "Duluth": (428, 164),
+    "El Paso": (286, 419),
+    "Helena": (252, 169),
+    "Houston": (451, 431),
+    "Kansas City": (420, 271),
+    "Las Vegas": (158, 342),
+    "Little Rock": (473, 338),
+    "Los Angeles": (108, 387),
+    "Miami": (692,453),
+    "Montreal": (670,63),
+    "Nashville": (556, 301),
+    "New Orleans": (523, 425),
+    "New York": (684,164),
+    "Oklahoma City": (406, 336),
+    "Omaha": (405, 233),
+    "Phoenix": (199,390),
+    "Pittsburgh": (619, 199),
+    "Portland": (62, 162),
+    "Raleigh": (645,284),
+    "Saint Louis": (486, 272),
+    "Salt Lake City": (198,261),
+    "San Francisco": (54,307),
+    "Santa Fe": (290,351),
+    "Sault Ste Marie": (523, 114),
+    "Seattle": (78,124),
+    "Toronto": (606, 129),
+    "Vancouver": (80,80),
+    "Winnipeg": (347, 76),
+    "Washington": (690, 233),
+}
+
 
 # Définition des routes (Ville1, Ville2, couleur, longueur)
 ROUTES_USA = [
-    ("Atlanta", "Nashville", "grey", 1),
-    ("Atlanta", "Miami", "blue", 5),
-    ("Atlanta", "New Orleans", "yellow", 4),
-    ("Atlanta", "Charleston", "blue", 2),
-    ("Boston", "New York", "yellow", 2),
-    ("Boston", "Montreal", "grey", 2),
-    ("Calgary", "Helena", "grey", 4),
-    ("Calgary", "Seattle", "grey", 4),
-    ("Charleston", "Miami", "pink", 4),
-    ("Chicago", "Duluth", "red", 3),
-    ("Chicago", "Omaha", "blue", 4),
-    ("Chicago", "Pittsburgh", "orange", 3),
-    ("Chicago", "Saint Louis", "green", 2),
-    ("Dallas", "Houston", "grey", 1),
-    ("Dallas", "Little Rock", "grey", 2),
-    ("Dallas", "Oklahoma City", "grey", 2),
-    ("Denver", "Kansas City", "black", 4),
-    ("Denver", "Kansas City", "orange", 4),
-    ("Denver", "Oklahoma City", "red", 4),
-    ("Denver", "Santa Fe", "grey", 2),
-    ("Denver", "Salt Lake City", "red", 3),
-    ("Duluth", "Omaha", "grey", 2),
-    ("Duluth", "Sault Ste Marie", "grey", 3),
-    ("Duluth", "Toronto", "pink", 6),
-    ("El Paso", "Dallas", "red", 4),
-    ("El Paso", "Houston", "green", 6),
-    ("El Paso", "Los Angeles", "black", 6),
-    ("El Paso", "Oklahoma City", "yellow", 5),
-    ("El Paso", "Phoenix", "grey", 3),
-    ("Helena", "Denver", "green", 4),
-    ("Helena", "Duluth", "orange", 6),
-    ("Helena", "Omaha", "red", 5),
-    ("Helena", "Salt Lake City", "pink", 3),
-    ("Helena", "Seattle", "yellow", 6),
-    ("Houston", "New Orleans", "pink", 2),
-    ("Kansas City", "Oklahoma City", "grey", 2),
-    ("Kansas City", "Saint Louis", "blue", 2),
-    ("Las Vegas", "Los Angeles", "grey", 2),
-    ("Las Vegas", "Salt Lake City", "orange", 3),
-    ("Little Rock", "New Orleans", "green", 3),
-    ("Little Rock", "Nashville", "white", 3),
-    ("Little Rock", "Oklahoma City", "grey", 2),
-    ("Los Angeles", "Phoenix", "grey", 3),
-    ("Los Angeles", "San Francisco", "pink", 3),
-    ("Los Angeles", "San Francisco", "yellow", 3),
-    ("Miami", "New Orleans", "red", 6),
-    ("Montreal", "New York", "blue", 3),
-    ("Montreal", "Sault Ste Marie", "black", 5),
-    ("Nashville", "Pittsburgh", "yellow", 4),
-    ("Nashville", "Saint Louis", "grey", 2),
-    ("New Orleans", "Houston", "grey", 2),
-    ("New Orleans", "Atlanta", "yellow", 4),
-    ("New Orleans", "Miami", "red", 6),
-    ("New York", "Pittsburgh", "green", 2),
-    ("New York", "Washington", "black", 2),
-    ("Oklahoma City", "Santa Fe", "blue", 3),
-    ("Omaha", "Kansas City", "grey", 1),
-    ("Omaha", "Chicago", "blue", 4),
-    ("Omaha", "Denver", "pink", 4),
-    ("Phoenix", "Santa Fe", "grey", 3),
-    ("Pittsburgh", "Saint Louis", "green", 5),
-    ("Pittsburgh", "Washington", "grey", 2),
-    ("Portland", "Salt Lake City", "blue", 6),
-    ("Portland", "San Francisco", "green", 5),
-    ("Portland", "Seattle", "grey", 1),
-    ("Raleigh", "Charleston", "grey", 2),
-    ("Raleigh", "Pittsburgh", "grey", 2),
-    ("Raleigh", "Washington", "grey", 2),
-    ("Saint Louis", "Kansas City", "blue", 2),
-    ("Saint Louis", "Little Rock", "grey", 2),
-    ("Saint Louis", "Pittsburgh", "green", 5),
-    ("Salt Lake City", "San Francisco", "orange", 5),
-    ("Salt Lake City", "Denver", "red", 3),
-    ("Salt Lake City", "Helena", "pink", 3),
-    ("Salt Lake City", "Las Vegas", "orange", 3),
-    ("San Francisco", "Portland", "green", 5),
-    ("San Francisco", "Salt Lake City", "orange", 5),
-    ("San Francisco", "Los Angeles", "pink", 3),
-    ("San Francisco", "Los Angeles", "yellow", 3),
-    ("Sault Ste Marie", "Duluth", "grey", 3),
-    ("Sault Ste Marie", "Montreal", "black", 5),
-    ("Seattle", "Calgary", "grey", 4),
-    ("Seattle", "Helena", "yellow", 6),
-    ("Seattle", "Portland", "grey", 1),
-    ("Toronto", "Duluth", "pink", 6),
-    ("Toronto", "Montreal", "grey", 3),
-    ("Toronto", "Pittsburgh", "grey", 2),
-    ("Vancouver", "Calgary", "grey", 3),
-    ("Vancouver", "Seattle", "grey", 1),
-    ("Washington", "New York", "black", 2),
-    ("Washington", "Pittsburgh", "grey", 2),
-    ("Winnipeg", "Calgary", "white", 6),
-    ("Winnipeg", "Helena", "blue", 4),
-    ("Winnipeg", "Duluth", "black", 4),
-    ("Winnipeg", "Sault Ste Marie", "grey", 6)
-    
+    ("Vancouver", "Calgary", "grey", 3, False),
+    ("Vancouver", "Seattle", "grey", 1, True),
+    ("Vancouver", "Seattle", "grey", 1, True),
+    ("Seattle", "Calgary", "grey", 4, False),
+    ("Seattle", "Portland", "grey", 1, True),
+    ("Seattle", "Portland", "grey", 1, True),
+    ("Portland", "Salt Lake City", "blue", 6, False),
+    ("Portland", "San Francisco", "green", 5, True),
+    ("Portland", "San Francisco", "green", 5, True),
+    ("San Francisco", "Salt Lake City", "orange", 5, True),
+    ("San Francisco", "Salt Lake City", "white", 5, True),
+    ("San Francisco", "Los Angeles", "pink", 3, True),
+    ("San Francisco", "Los Angeles", "yellow", 3, True),
+    ("Los Angeles", "Las Vegas", "grey", 2, False),
+    ("Los Angeles", "Phoenix", "grey", 3, False),
+    ("Los Angeles", "El Paso", "black", 6, False),
+    ("Calgary", "Winnipeg", "white", 5, False),
+    ("Helena", "Winnipeg", "blue", 4, False),
+    ("Helena", "Seattle", "yellow", 6, False),
+    ("Helena", "Calgary", "grey", 4, False),
+    ("Helena", "Denver", "green", 4, False),
+    ("Helena", "Duluth", "orange", 6, False),
+    ("Helena", "Omaha", "red", 5, False),
+    ("Helena", "Salt Lake City", "pink", 3, False),
+    ("Salt Lake City", "Denver", "red", 3, True),
+    ("Salt Lake City", "Denver", "yellow", 3, True),
+    ("Salt Lake City", "Las Vegas", "orange", 3, False),
+    ("Phoenix", "El Paso", "grey", 3, False),
+    ("Phoenix", "Santa Fe", "grey", 3, False),
+    ("Phoenix", "Denver", "white", 3, False),
+    ("Denver", "Kansas City", "black", 4, True),
+    ("Denver", "Kansas City", "orange", 4, True),
+    ("Denver", "Oklahoma City", "red", 4, False),
+    ("Denver", "Santa Fe", "grey", 2, False),
+    ("Denver", "Omaha", "pink", 4, False),
+    ("Santa Fe", "Oklahoma City", "blue", 3, False),
+    ("Santa Fe", "El Paso", "grey", 3, False),
+    ("El Paso", "Dallas", "red", 4, False),
+    ("El Paso", "Houston", "green", 6, False),
+    ("El Paso", "Oklahoma City", "yellow", 5, False),
+    ("Winnipeg", "Sault Ste Marie", "grey", 6, False),
+    ("Winnipeg", "Duluth", "black", 6, False),
+    ("Duluth", "Omaha", "grey", 2, True),
+    ("Duluth", "Omaha", "grey", 2, True),
+    ("Duluth", "Sault Ste Marie", "grey", 3, False),
+    ("Duluth", "Toronto", "pink", 6, False),
+    ("Duluth", "Chicago", "red", 3, False),
+    ("Omaha", "Kansas City", "grey", 1, True),
+    ("Omaha", "Kansas City", "grey", 1, True),
+    ("Omaha", "Chicago", "blue", 4, False),
+    ("Kansas City", "Saint Louis", "blue", 2, True),
+    ("Kansas City", "Saint Louis", "pink", 2, True),
+    ("Kansas City", "Oklahoma City", "grey", 2, True),
+    ("Kansas City", "Oklahoma City", "grey", 2, True),
+    ("Oklahoma City", "Dallas", "grey", 2, True),
+    ("Oklahoma City", "Dallas", "grey", 2, True),
+    ("Oklahoma City", "Little Rock", "grey", 2, False),
+    ("Dallas", "Houston", "grey", 1, True),
+    ("Dallas", "Houston", "grey", 1, True),
+    ("Dallas", "Little Rock", "grey", 2, False),
+    ("Houston", "New Orleans", "grey", 2, False),
+    ("Little Rock", "New Orleans", "green", 3, False),
+    ("Little Rock", "Saint Louis", "grey", 2, False),
+    ("Little Rock", "Nashville", "white", 3, False),
+    ("Saint Louis", "Nashville", "grey", 2, False),
+    ("Saint Louis", "Pittsburgh", "green", 5, False),
+    ("Saint Louis", "Chicago", "green", 2, False),
+    ("Chicago", "Pittsburgh", "orange", 3, True),
+    ("Chicago", "Pittsburgh", "black", 3, True),
+    ("Chicago", "Toronto", "white", 4, False),
+    ("Sault Ste Marie", "Montreal", "black", 5, False),
+    ("Sault Ste Marie", "Toronto", "grey", 2, False),
+    ("Toronto", "Pittsburgh", "grey", 2, False),
+    ("Toronto", "Montreal", "grey", 3, False),
+    ("Montreal", "New York", "blue", 3, False),
+    ("Montreal", "Boston", "grey", 2, True),
+    ("Montreal", "Boston", "grey", 2, True),
+    ("Boston", "New York", "yellow", 2, True),
+    ("Boston", "New York", "red", 2, True),
+    ("New York", "Pittsburgh", "green", 2, True),
+    ("New York", "Pittsburgh", "white", 2, True),
+    ("New York", "Washington", "black", 2, True),
+    ("New York", "Washington", "orange", 2, True),
+    ("Pittsburgh", "Washington", "grey", 2, False),
+    ("Pittsburgh", "Raleigh", "grey", 2, False),
+    ("Pittsburgh", "Nashville", "yellow", 4, False),
+    ("Raleigh", "Charleston", "grey", 2, False),
+    ("Raleigh", "Washington", "grey", 2, True),
+    ("Raleigh", "Washington", "grey", 2, True),
+    ("Raleigh", "Nashville", "black", 3, False),
+    ("Raleigh", "Atlanta", "grey", 3, True),
+    ("Raleigh", "Atlanta", "grey", 3, True),
+    ("Atlanta", "Nashville", "grey", 1, False),
+    ("Atlanta", "Miami", "blue", 5, False),
+    ("Atlanta", "New Orleans", "yellow", 4, True),
+    ("Atlanta", "New Orleans", "orange", 4, True),
+    ("Atlanta", "Charleston", "grey", 2, False),
+    ("Miami", "Charleston", "pink", 4, False),
+    ("Miami", "New Orleans", "red", 6, False),
 ]
 
 # Définition des cartes destination (Ville1, Ville2, points)
@@ -180,7 +222,7 @@ class Table:
         self.joueurs = joueurs
         self.plateau = Plateau(VILLES_USA, ROUTES_USA)
         self.pioche_wagon = PiocheWagon([CarteWagon(c) for c in ["red", "blue", "green", "yellow", "black", "white", "orange", "pink"] * 12 + ["locomotive"] * 14])
-        self.pioche_itineraire = PiocheItineraire([CarteItineraire(v1, v2, p) for v1, v2, p in CARTES_DESTINATION_USA])
+        self.pioche_itineraire = PiocheItineraire([CarteItineraire(self.plateau.dico_villes[v1], self.plateau.dico_villes[v2], p) for v1, v2, p in CARTES_DESTINATION_USA])
         self.score = 0
 
     def initialiser_partie(self):
@@ -203,6 +245,9 @@ class Table:
     def jouer_tour(self, joueur):
         """Permet à un joueur de jouer son tour avec validation stricte"""
         while True:
+            print("\n")
+
+            self.afficher_cartes_visibles()
 
             print(f"\n{joueur.nom}, c'est votre tour !")
             # Compter les occurrences des couleurs dans les cartes du joueur
@@ -212,9 +257,8 @@ class Table:
             print("Voici vos cartes wagon :")
             for couleur, count in couleurs_cartes.items():
                 print(f"{couleur}: {count}")
-            print("Voici vos cartes destination :", [f"{c.ville_depart} → {c.ville_arrivee}" for c in joueur.cartes_defi])
+            print("Voici vos cartes destination :", [f"{c.ville_depart.nom} → {c.ville_arrivee.nom}" for c in joueur.cartes_defi])
             print(f"Nombre de wagons restants : {joueur.wagons_restants}")
-
             print("1. Piocher une carte wagon")
             print("2. Capturer une route")
             print("3. Piocher des cartes destination")
@@ -623,7 +667,7 @@ class Table:
 
         print(f"\n{joueur.nom}, voici vos cartes destination :")
         for i, carte in enumerate(piochees):
-            print(f"{i + 1}: {carte.ville_depart} → {carte.ville_arrivee} ({carte.points} points)")
+            print(f"{i + 1}: {carte.ville_depart.nom} → {carte.ville_arrivee.nom} ({carte.points} points)")
 
         cartes_a_reposer = []
 
@@ -637,7 +681,7 @@ class Table:
             if len(piochees) > 1:
                 for i, carte in enumerate(piochees):
                     print("voici les cartes destination qui vous restent :")
-                    print(f"{i + 1}: {carte.ville_depart} → {carte.ville_arrivee} ({carte.points} points)")
+                    print(f"{i + 1}: {carte.ville_depart.nom} → {carte.ville_arrivee.nom} ({carte.points} points)")
                 choix2 = input("Voulez-vous reposer une autre carte ? (0 = non, sinon 1 ou 2) : ")
                 if choix2 in ["1", "2"]:
                     cartes_a_reposer.append(piochees.pop(int(choix2) - 1))  # Repose une deuxième carte
@@ -753,7 +797,6 @@ class Joueur:
         print(f"{self.nom} garde {len(cartes)} carte(s) et repose {len(cartes_a_reposer)} carte(s).")
         return cartes, cartes_a_reposer
 
-
     def verifier_cartes_wagon(self, route):
         """Vérifie si le joueur possède les cartes nécessaires pour capturer la route"""
         couleur = route.couleur
@@ -805,23 +848,19 @@ class Joueur:
         for route in self.routes_capturees:
             G.add_edge(route.Ville1.nom, route.Ville2.nom)
 
-        print("Villes dans le graphe :", list(G.nodes))
-        print("Recherche de chemin entre :", ville_depart, "et", ville_arrivee)
-
-        if ville_depart not in G or ville_arrivee not in G:
-            print("❌ Une des villes n'est pas dans le graphe.")
+        try:
+            return nx.has_path(G, ville_depart, ville_arrivee)
+        except nx.NetworkXError:
             return False
-
-        return nx.has_path(G, ville_depart, ville_arrivee)
 
     def calculer_points_destinations(self):
             points = 0
             for destination in self.cartes_defi:
                 if self.villes_reliees(destination.ville_depart, destination.ville_arrivee):
-                    print(f"Objectif réussi : {destination.ville_depart} → {destination.ville_arrivee} (+{destination.points} points)")
+                    print(f"Objectif réussi : {destination.ville_depart.nom} → {destination.ville_arrivee.nom} (+{destination.points} points)")
                     points += destination.points
                 else:
-                    print(f"Objectif échoué : {destination.ville_depart} → {destination.ville_arrivee} (+{destination.points} points)")
+                    print(f"Objectif échoué : {destination.ville_depart.nom} → {destination.ville_arrivee.nom} (+{destination.points} points)")
                     points -= destination.points
             return points
 
@@ -934,7 +973,7 @@ class CarteItineraire(Carte):
         self.possesseur = None  # Joueur possédant cette carte
 
     def __str__(self):
-        return f"{self.ville_depart} → {self.ville_arrivee} ({self.points} points)"
+        return f"{self.ville_depart.nom} → {self.ville_arrivee.nom} ({self.points} points)"
 
 #endregion
 
@@ -1021,22 +1060,9 @@ class Plateau:
     def __init__(self, dico_ville, dico_route):
         self.villes = [Ville(nom, coordonnees=dico_ville[nom]) for nom in dico_ville]
         self.dico_villes = {ville.nom: ville for ville in self.villes}
-        self.routes = [Route(self.dico_villes[V1], self.dico_villes[V2], couleur, longueur) for V1, V2, couleur, longueur in dico_route]
+        self.routes = [Route(self.dico_villes[V1], self.dico_villes[V2], couleur, longueur, double) for V1, V2, couleur, longueur, double in dico_route]
         self.afficher_plateau_graphique()
 
-    def double(self, route):
-        """Renvoie True si une autre route relie les mêmes villes (dans un sens ou dans l’autre)"""
-        v1, v2 = route.Ville1.nom, route.Ville2.nom
-
-        for autre in self.routes:
-            if autre is route:
-                continue
-            # comparer sans tenir compte de l'ordre
-            villes = {autre.Ville1.nom, autre.Ville2.nom}
-            if {v1, v2} == villes:
-                return True
-
-        return False
 
     def sous_graphe_joueur(self, joueur):
         G = nx.Graph()
@@ -1045,41 +1071,65 @@ class Plateau:
                 G.add_edge(route.Ville1.nom, route.Ville2.nom)
         return G
 
-    def afficher_plateau_graphique(self): #ebauche de visualisation des routes avec des rectangles
-        plt.figure(figsize=(12, 8))
+    def afficher_plateau_graphique(self):
+        #visualisation des routes avec des rectangles
+        fig, ax = plt.subplots(figsize=(11.74, 7.42))
+
+        #fig.patch.set_facecolor("#faf0e6")
+        #ax.set_facecolor("#faf0e6")
+        #ax.patch.set_facecolor("#faf0e6")
+        img = mpimg.imread("plateau.png")
+        img_flipped = np.flipud(img)
+        ax.imshow(img_flipped, extent=[0, 768, 0, 517], zorder=0)
+        ax.invert_yaxis()
 
         for ville in self.villes:
             x, y = ville.coordonnees
-            plt.plot(x, y, 'o', color='black')
-            plt.text(x, y + 0.03, ville.nom, ha='center', fontsize=8)
+            ax.plot(x, y, 'o', color='black')
+            ax.text(x, y, ville.nom, ha='center', fontsize=8)
+
+        i = 1
 
         for route in self.routes:
+
             x1, y1 = route.Ville1.coordonnees
             x2, y2 = route.Ville2.coordonnees
 
             dx, dy = x2 - x1, y2 - y1
             L = np.sqrt(dx ** 2 + dy ** 2)
             ux, uy = dx / L, dy / L  # vecteur direction unitaire
-            px, py = -uy * 0.2, ux * 0.2  # vecteur perpendiculaire pour double route
+            norme = np.sqrt(ux ** 2 + uy ** 2)
+            px, py = (-uy / norme) * 5, (ux / norme) * 5
 
             # Couleur de la bordure (route) et remplissage
             border_color = route.couleur
-            fill_color = "white" if route.possesseur is None else route.possesseur.couleur
-
-            # Décalage si route double
-            offset = (px, py) if getattr(route, "double", False) else (0, 0)
+            if route.possesseur is None:
+                fill_color = "white"
+            else:
+                fill_color = route.possesseur.couleur
 
             # Tracer les wagons
-            wagon_length = 0.025  # en unité normalisée, pour un plateau [0, 1]
-            wagon_height = 0.012
+            wagon_length = 23
+            wagon_height = 7
 
             total_wagon_length = wagon_length * route.longueur
             gap = (L - total_wagon_length) / (route.longueur + 1)
 
-            for i in range(route.longueur):
-                d = gap * (i + 1) + wagon_length * i + wagon_length / 2
-                cx = x1 + d * ux + offset[0]
-                cy = y1 + d * uy + offset[1]
+            if route.double :
+                i = -i
+
+            for j in range(route.longueur):
+                d = gap * (j + 1) + wagon_length * j + wagon_length / 2
+
+                fraction = (j + 1) / (route.longueur + 1)
+                cx = x1 + fraction * dx
+                cy = y1 + fraction * dy
+                if route.double:
+                    cx += px*i
+                    cy +=py*i
+
+
+
 
                 angle = np.degrees(np.arctan2(dy, dx))
                 rect = patches.Rectangle(
@@ -1091,14 +1141,14 @@ class Plateau:
                     edgecolor=border_color,
                     facecolor=fill_color
                 )
-                plt.gca().add_patch(rect)
+                ax.add_patch(rect)
 
         plt.axis('equal')
         plt.axis('off')
         plt.title("Plateau des Aventuriers du Rail — affichage par wagons")
         plt.show()
 
-    def afficher_plateau_graphique_(self):
+    def afficher_plateau_graphique_nx(self):
         G = nx.Graph()
 
         # Ajouter les villes comme nœuds
@@ -1120,8 +1170,8 @@ class Plateau:
         # Ajouter des annotations si une route est capturée
         for route in self.routes:
             if route.etat == "capturée":
-                x_pos = (pos[route.Ville1.nom][0] + pos[route.Ville2.nom][0]) / 2
-                y_pos = (pos[route.Ville1.nom][1] + pos[route.Ville2.n][1]) / 2
+                x_pos = (pos[route.Ville1][0] + pos[route.Ville2][0]) / 2
+                y_pos = (pos[route.Ville1][1] + pos[route.Ville2][1]) / 2
                 plt.text(x_pos, y_pos, "capturée", fontsize=10, ha='center', color="black")
 
 
@@ -1140,11 +1190,12 @@ class Ville:
 # Classe représentant une route entre deux villes
 class Route:
 
-    def __init__(self, Ville1, Ville2, couleur, longueur):
+    def __init__(self, Ville1, Ville2, couleur, longueur, double):
         self.Ville1 = Ville1
         self.Ville2 = Ville2
         self.longueur = longueur
         self.couleur = couleur
+        self.double = double
         self.possesseur = None
         self.etat = "disponible"  # Par défaut, la route est disponible
 
