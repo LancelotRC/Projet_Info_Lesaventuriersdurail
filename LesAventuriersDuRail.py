@@ -213,6 +213,7 @@ CARTES_DESTINATION_USA = [
 ]
 #endregion
 
+
 #region === Classes principales ===
 
 # Classe principale regroupant tout
@@ -351,7 +352,6 @@ class Table:
             print("plus de cartes wagon disponibles")
             return None
 
-
         while Loco or len(cartes_piochees) <2 :
 
             # Affichage des cartes visibles
@@ -427,6 +427,240 @@ class Table:
 
                 except ValueError:
                     print("❌ Entrée invalide. Veuillez entrer un numéro valide.")
+
+    # def sauvegarder(self, joueur):
+        
+        
+    #     if not joueur.routes_capturees:
+    #         score = 0
+    #     else:
+    #         score = joueur.calculer_points_routes() + joueur.calculer_points_destinations()
+   
+    #     if joueur == self.joueur_plus_longue_route():
+    #         score += 10
+        
+    #     sauvegarde = {
+    #         "joueur": {
+    #         "nom": joueur.nom,
+    #         "cartes_wagon": [carte.couleur for carte in joueur.cartes_wagon],
+    #         "cartes_defi": [
+    #             {
+    #                 "depart": c.ville_depart,
+    #                 "arrivee": c.ville_arrivee
+    #             } for c in joueur.cartes_defi],
+    #         "wagons_restants": joueur.wagons_restants,
+    #         "score": score
+    #     },
+    #     "plateau": {
+    #         "routes": [
+    #             {
+    #                 "ville1": r.Ville1.nom,
+    #                 "ville2": r.Ville2.nom,
+    #                 "etat": r.etat,
+    #                 "couleur": r.couleur,
+    #                 "longueur": r.longueur
+    #             } for r in self.plateau.routes
+    #         ]
+    #     }
+    # }
+        
+    #     with open("sauvegarde.json", "w", encoding="utf-8") as f:
+    #         json.dump(sauvegarde, f, indent=4, ensure_ascii=False)
+
+    #     print("✅ Partie enregistrée dans 'sauvegarde.json'.")
+
+    def sauvegarder(self, joueur):
+        """Sauvegarde l'état de la partie dans un fichier JSON"""
+        donnees = {
+            "joueurs": [
+                {
+                    "nom": j.nom,
+                    "couleur": j.couleur,
+                    "wagons_restants": j.wagons_restants,
+                    "cartes_defi": [
+                        {
+                            "ville_depart": c.ville_depart,
+                            "ville_arrivee": c.ville_arrivee,
+                            "points": c.points
+                            }
+                        for c in j.cartes_defi
+                        ],
+                    "routes_capturees": [
+                        {
+                            "ville1": r.Ville1.nom,
+                            "ville2": r.Ville2.nom,
+                            "couleur": r.couleur,
+                            "longueur": r.longueur
+                            }
+                        for r in j.routes_capturees
+                        ]
+                    }
+                for j in self.joueurs
+                ]
+            }
+
+        with open("sauvegarde.json", "w") as f:
+            json.dump(donnees, f, indent=4)
+
+            print("✅ Partie enregistrée dans 'sauvegarde.json'.")
+        
+    # def sauvegarder(self, joueur):
+    #     """Sauvegarde l’état complet du jeu dans un fichier JSON."""
+    #     nom_fichier = "sauvegarde.json"
+
+    #     data = {
+    #         "joueurs": [],
+    #         "routes_capturees": [],
+    #         }
+
+    #     for j in self.joueurs:
+    #         joueur_data = {
+    #             "nom": j.nom,
+    #             "couleur": j.couleur,
+    #             "score": j.calculer_points_routes() + j.calculer_points_destinations(),
+    #             "routes_capturees": [(r.Ville1.nom, r.Ville2.nom) for r in j.routes_capturees],
+    #             "objectifs": [(o.ville_depart, o.ville_arrivee) for o in j.objectifs]
+    #             }
+    #         data["joueurs"].append(joueur_data)
+            
+    #         data["routes_capturees"] = [
+    #             {"ville1": r.Ville1.nom, "ville2": r.Ville2.nom, "couleur": r.couleur, "longueur": r.longueur, "possesseur": r.possesseur.nom if r.possesseur else None}
+    #             for r in self.plateau.routes
+    #             ]
+
+    #     with open(nom_fichier, "w") as f:
+    #         json.dump(data, f, indent=4)
+            
+    #         print(f"✅ Partie enregistrée dans '{nom_fichier}'.")
+    
+    # def charger_sauvegarde(self, fichier="sauvegarde.json"):
+    #     """Recharge une partie depuis un fichier JSON."""
+    #     with open(fichier, "r") as f:
+    #         data = json.load(f)
+            
+    #         self.joueurs = []
+    #         noms_joueurs = [j["nom"] for j in data["joueurs"]]
+            
+    #         for jdata in data["joueurs"]:
+    #             j = Joueur(jdata["nom"], jdata["couleur"])
+    #             j.objectifs = [Objectif(dep, arr) for dep, arr in jdata["objectifs"]]
+    #             self.joueurs.append(j)
+                
+    #             # Réassigner les routes capturées
+    #             for rdata in data["routes_capturees"]:
+    #                 for r in self.plateau.routes:
+    #                     if (r.Ville1.nom == rdata["ville1"] and r.Ville2.nom == rdata["ville2"]) or \
+    #                         (r.Ville1.nom == rdata["ville2"] and r.Ville2.nom == rdata["ville1"]):
+    #                             if rdata["possesseur"]:
+    #                                 joueur = next(j for j in self.joueurs if j.nom == rdata["possesseur"])
+    #                                 r.possesseur = joueur
+    #                                 r.etat = "capturée"
+    #                                 joueur.routes_capturees.append(r)
+    #                             break
+                                
+    #         print("✅ Partie chargée avec succès.")
+
+    @classmethod
+    def charger_partie(cls, fichier="sauvegarde.json"):
+        """Charge une partie à partir d'un fichier JSON"""
+        with open(fichier, "r") as f:
+            data = json.load(f)
+            
+            joueurs = []
+            for j_data in data["joueurs"]:
+                j = Joueur(j_data["nom"], j_data["couleur"])
+                j.wagons_restants = j_data["wagons_restants"]
+                
+                # Restaurer les cartes objectif
+                j.cartes_defi = [
+                    CarteItineraire(d["ville_depart"], d["ville_arrivee"], d["points"])
+                    for d in j_data["cartes_defi"]
+                    ]
+                
+                # On stocke les infos des routes pour les relier plus tard
+                j.routes_a_restaurer = j_data["routes_capturees"]
+                
+                joueurs.append(j)
+                
+                table = cls(joueurs)
+                
+                # Restaurer les routes capturées
+                for joueur in joueurs:
+                    for r_data in joueur.routes_a_restaurer:
+                        for route in table.plateau.routes:
+                            if (
+                                {route.Ville1.nom, route.Ville2.nom} ==
+                                {r_data["ville1"], r_data["ville2"]} and
+                                route.longueur == r_data["longueur"]
+                            ):
+                                route.possesseur = joueur
+                                route.etat = "capturée"
+                                joueur.routes_capturees.append(route)
+                                break
+                            
+        print("✅ Partie chargée depuis 'sauvegarde.json'")
+        return table
+                        
+                    
+    def choisir_si_enregistrer(self,joueur):
+        
+        """Permet au joueur de choisir s'il veut enregistrer ou quitter"""
+        while True:
+            print(f"{joueur.nom}, vous avez choisi de quitter le jeu.")        
+            choix = input("Voulez vous enregistrer la partie en cours ? (0,1) :")
+            print("0. non")
+            print("1. oui")
+        
+            if choix == "0":
+                print(f"Vous avez choisi d'abandonner la partie")
+                print("Fin de la partie. Merci d'avoir joué !")
+                sys.exit()
+            elif choix == "1":
+                print("la partie sera enregistrée")
+                self.sauvegarder(joueur)
+                sys.exit()
+            
+            else:
+                print("veuiller reessayer")
+            
+    # def charger_sauvegarde(self):
+    #     import json
+    #     from collections import Counter
+
+    #     try:
+    #         with open("sauvegarde.json", "r", encoding="utf-8") as f:
+    #             data = json.load(f)
+    #     except FileNotFoundError:
+    #         print("❌ Aucun fichier de sauvegarde trouvé.")
+    #         return
+
+    #     joueur_data = data["joueur"]
+    #     plateau_data = data["plateau"]
+
+    # # --- Recréer le joueur ---
+    #     joueur = Joueur(joueur_data["nom"])
+    
+    # # Reconstituer les cartes wagon
+    #     joueur.cartes_wagon = [CarteWagon(couleur) for couleur in joueur_data["cartes_wagon"]]
+    
+    # # Reconstituer les cartes destination
+    #     joueur.cartes_defi = [CARTES_DESTINATION_USA(self.plateau.get_ville(c["depart"]), self.plateau.get_ville(c["arrivee"]))for c in joueur_data["cartes_defi"]]
+
+    #     joueur.wagons_restants = joueur_data["wagons_restants"]
+    #     joueur.score = joueur_data.get("score", 0)
+
+    #     self.joueurs = [joueur]  # on charge une seule sauvegarde pour l'instant
+
+    # # --- Recréer les routes du plateau ---
+    #     for route_data in plateau_data["routes"]:
+    #         for route in self.plateau.routes:
+    #             if (route.Ville1.nom == route_data["ville1"] and route.Ville2.nom == route_data["ville2"]) or (route.Ville1.nom == route_data["ville2"] and route.Ville2.nom == route_data["ville1"]):
+    #                 route.etat = route_data["etat"]
+    #                 break
+
+    #     print(f"✅ Partie chargée avec succès pour {joueur.nom} !")
+
+
 
     def piocher_cartes_itineraire(self, joueur):
         """Permet au joueur de piocher 3 cartes destination et d'en garder au moins une."""

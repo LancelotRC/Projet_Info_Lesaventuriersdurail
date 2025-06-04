@@ -71,6 +71,7 @@ class TestPiocheCartesWagon(unittest.TestCase):
         self.joueur = Joueur("Alice", "rouge")
         self.table = Table([self.joueur])
 
+
     @patch('builtins.input', return_value="1")
     def test_piocher_cartes_wagon_simple(self, mock_input):
         """Test : Le joueur pioche 2 cartes normales."""
