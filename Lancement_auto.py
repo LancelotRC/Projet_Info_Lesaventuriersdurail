@@ -4,7 +4,7 @@ if __name__ == "__main__":
     print("\n=== Lancement manuel du jeu Les Aventuriers du Rail ===")
 
     # Création des joueurs
-    joueurs = [Joueur("Alice", "red"), JoueurAuto("Bob", "blue"), JoueurAuto("David", "pink")]
+    joueurs = [JoueurAuto("Alice", "red"), JoueurAuto("Bob", "blue"), JoueurAuto("David", "pink")]
     table = Table(joueurs)
 
     
@@ -48,6 +48,12 @@ if __name__ == "__main__":
                 dernier_tour = True
                 print(f"{joueur.nom} a {joueur.wagons_restants} wagons ou moins.")
                 print("Dernier tour pour les autres joueurs.")
+                
+            if table.pioche_wagon.pioche == [] and not dernier_tour :
+                dernier_joueur = joueur
+                dernier_tour = True
+                print(f"il reste {joueur.wagons_restants} cartes wagons ou moins dans la pioche.")
+                print("Dernier tour pour les autres joueurs.")
         else :
             for joueur in table.joueurs:
                 print(f"\n=== Résumé pour {joueur.nom} ===")
@@ -63,4 +69,4 @@ if __name__ == "__main__":
             break
 
     table.plateau.afficher_plateau_graphique()
-    table.compte_des_points()
+    table.compte_des_points(table.plateau)
