@@ -45,6 +45,12 @@ if __name__ == "__main__":
                 dernier_tour = True
                 print(f"{joueur.nom} a {joueur.wagons_restants} wagons ou moins.")
                 print("Dernier tour pour les autres joueurs.")
+                
+            if table.pioche_wagon.pioche == [] and not dernier_tour :
+                dernier_joueur = joueur
+                dernier_tour = True
+                print(f"il reste {joueur.wagons_restants} cartes wagons ou moins dans la pioche.")
+                print("Dernier tour pour les autres joueurs.")
         else :
             for joueur in table.joueurs:
                 print(f"\n=== Résumé pour {joueur.nom} ===")
@@ -59,4 +65,4 @@ if __name__ == "__main__":
         if dernier_tour :
             break
 
-    Table.compte_des_points()
+    table.compte_des_points(table.plateau)
