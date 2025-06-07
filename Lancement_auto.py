@@ -4,7 +4,7 @@ if __name__ == "__main__":
     print("\n=== Lancement manuel du jeu Les Aventuriers du Rail ===")
 
     # Création des joueurs
-    joueurs = [JoueurAuto("Alice", "red"), JoueurAuto("Bob", "blue")]#, JoueurAuto("David", "Jaune")]
+    joueurs = [Joueur("Alice", "red"), JoueurAuto("Bob", "blue"), JoueurAuto("David", "pink")]
     table = Table(joueurs)
 
     
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     for joueur in joueurs:
         print(f"\n{joueur.nom} ({joueur.couleur}) commence avec :")
         print("Cartes wagon :", [c.couleur for c in joueur.cartes_wagon])
-        print("Cartes destination :", [f"{c.ville_depart} → {c.ville_arrivee}" for c in joueur.cartes_defi])
+        print("Cartes destination :", [f"{c.ville_depart.nom} → {c.ville_arrivee.nom}" for c in joueur.cartes_defi])
 
     # Début de la partie (chaque joueur joue à tour de rôle)
     print("\n=== Début de la partie ===")
@@ -59,6 +59,8 @@ if __name__ == "__main__":
 
             tour += 1
             continue
+        if dernier_tour :
+            break
 
-
-    Table.compte_des_points()
+    table.plateau.afficher_plateau_graphique()
+    table.compte_des_points()

@@ -21,8 +21,7 @@ if __name__ == "__main__":
     for joueur in joueurs:
         print(f"\n{joueur.nom} ({joueur.couleur}) commence avec :")
         print("Cartes wagon :", [c.couleur for c in joueur.cartes_wagon])
-        print("Cartes destination :", [f"{c.ville_depart} → {c.ville_arrivee}" for c in joueur.cartes_defi])
-        
+        print("Cartes destination :", [f"{c.ville_depart.nom} → {c.ville_arrivee.nom}" for c in joueur.cartes_defi])
         print("\n--- TEST: contenu brut de cartes_defi ---")
         print(joueurs[0].cartes_defi)
 
@@ -57,5 +56,7 @@ if __name__ == "__main__":
 
             tour += 1
             continue
+        if dernier_tour :
+            break
 
     Table.compte_des_points()
