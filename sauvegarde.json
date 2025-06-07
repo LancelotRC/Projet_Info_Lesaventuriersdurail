@@ -1,0 +1,179 @@
+{
+    "joueurs": [
+        {
+            "nom": "Alice",
+            "couleur": "red",
+            "wagons_restants": 3,
+            "cartes_wagon": [
+                "yellow",
+                "pink",
+                "pink",
+                "blue",
+                "yellow",
+                "black",
+                "red",
+                "blue",
+                "pink",
+                "yellow",
+                "black",
+                "pink",
+                "pink",
+                "pink",
+                "pink",
+                "blue",
+                "blue",
+                "green",
+                "locomotive",
+                "pink",
+                "locomotive"
+            ],
+            "cartes_defi": [
+                {
+                    "ville_depart": "New York",
+                    "ville_arrivee": "Dallas",
+                    "points": 11
+                },
+                {
+                    "ville_depart": "Winnipeg",
+                    "ville_arrivee": "Little Rock",
+                    "points": 11
+                },
+                {
+                    "ville_depart": "Winnipeg",
+                    "ville_arrivee": "Houston",
+                    "points": 12
+                },
+                {
+                    "ville_depart": "Chicago",
+                    "ville_arrivee": "New Orleans",
+                    "points": 7
+                },
+                {
+                    "ville_depart": "Kansas City",
+                    "ville_arrivee": "Houston",
+                    "points": 5
+                },
+                {
+                    "ville_depart": "New York",
+                    "ville_arrivee": "Atlanta",
+                    "points": 6
+                }
+            ],
+            "routes_capturees": [
+                {
+                    "ville1": "New York",
+                    "ville2": "Pittsburgh",
+                    "couleur": "green",
+                    "longueur": 2
+                },
+                {
+                    "ville1": "Saint Louis",
+                    "ville2": "Pittsburgh",
+                    "couleur": "green",
+                    "longueur": 5
+                },
+                {
+                    "ville1": "Little Rock",
+                    "ville2": "Saint Louis",
+                    "couleur": "grey",
+                    "longueur": 2
+                },
+                {
+                    "ville1": "Dallas",
+                    "ville2": "Little Rock",
+                    "couleur": "grey",
+                    "longueur": 2
+                },
+                {
+                    "ville1": "Winnipeg",
+                    "ville2": "Duluth",
+                    "couleur": "black",
+                    "longueur": 6
+                },
+                {
+                    "ville1": "Duluth",
+                    "ville2": "Chicago",
+                    "couleur": "red",
+                    "longueur": 3
+                },
+                {
+                    "ville1": "Chicago",
+                    "ville2": "Pittsburgh",
+                    "couleur": "orange",
+                    "longueur": 3
+                },
+                {
+                    "ville1": "Miami",
+                    "ville2": "New Orleans",
+                    "couleur": "red",
+                    "longueur": 6
+                },
+                {
+                    "ville1": "Atlanta",
+                    "ville2": "New Orleans",
+                    "couleur": "yellow",
+                    "longueur": 4
+                },
+                {
+                    "ville1": "Kansas City",
+                    "ville2": "Saint Louis",
+                    "couleur": "blue",
+                    "longueur": 2
+                },
+                {
+                    "ville1": "Atlanta",
+                    "ville2": "Nashville",
+                    "couleur": "grey",
+                    "longueur": 1
+                },
+                {
+                    "ville1": "Chicago",
+                    "ville2": "Toronto",
+                    "couleur": "white",
+                    "longueur": 4
+                },
+                {
+                    "ville1": "Saint Louis",
+                    "ville2": "Nashville",
+                    "couleur": "grey",
+                    "longueur": 2
+                }
+            ]
+        },
+        {
+            "nom": "Bob",
+            "couleur": "blue",
+            "wagons_restants": 43,
+            "cartes_wagon": [
+                "white",
+                "blue"
+            ],
+            "cartes_defi": [
+                {
+                    "ville_depart": "Denver",
+                    "ville_arrivee": "Pittsburgh",
+                    "points": 11
+                },
+                {
+                    "ville_depart": "Chicago",
+                    "ville_arrivee": "New Orleans",
+                    "points": 7
+                },
+                {
+                    "ville_depart": "San Francisco",
+                    "ville_arrivee": "Atlanta",
+                    "points": 17
+                }
+            ],
+            "routes_capturees": [
+                {
+                    "ville1": "New York",
+                    "ville2": "Washington",
+                    "couleur": "black",
+                    "longueur": 2
+                }
+            ]
+        }
+    ],
+    "joueur_actuel": 0
+}
