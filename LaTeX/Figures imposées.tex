@@ -1,0 +1,53 @@
+\chapter{Figures imposées}
+\addcontentsline{toc}{chapter}{Figures imposées}
+
+Le projet respecte plusieurs des figures imposées, réparties en deux catégories : les six figures communes à tous les sujets, et trois figures supplémentaires sélectionnées par le binôme.
+
+Nous listons ci-dessous ces figures, en distinguant celles qui sont clairement implémentées, celles qui restent à travailler, et celles qui ne sont pas pertinentes dans le cadre de notre projet.
+
+\section*{1. Figures imposées communes à tous les sujets}
+
+\begin{itemize}
+    \item \textbf{Création d’au moins quatre types d’objets avec variables d’instance} – \underline{Implémentée} \\
+    Le projet comprend les classes suivantes : \texttt{Table}, \texttt{Joueur}, \texttt{Plateau}, \texttt{CarteWagon}, \texttt{CarteItineraire}, \texttt{Ville}, \texttt{Route}. Chacune dispose de plusieurs variables d’instance décrivant leur état propre.
+
+    \item \textbf{Structuration du code en plusieurs modules} – \underline{Partiellement implémentée} \\
+    Le code principal est actuellement regroupé dans un fichier unique (\texttt{LesAventuriersDuRail.py}), mais un second module est dédié au diagramme de classes (\texttt{Diag\_classe.py}). Une restructuration en plusieurs modules thématiques (cartes, joueurs, plateau...) est prévue pour la version finale.
+
+    \item \textbf{Héritage / composition entre au moins trois types} – \underline{Partiellement implémentée} \\
+    Le code repose principalement sur la \textbf{composition} (ex. : \texttt{Table} contient un \texttt{Plateau}, des \texttt{Joueur}, des pioches), mais aucun héritage n'est actuellement utilisé. Il n’y a pas de classe abstraite de type \texttt{Carte}, ou \texttt{Pioche}. Cette figure sera retravaillée pour introduire un héritage minimal pertinent.
+
+    \item \textbf{Documentation et commentaires du code} – \underline{En cours} \\
+    Des docstrings explicatifs sont en cours d’ajout pour chaque classe et méthode. Le champ \texttt{:author:} est prévu pour identifier les contributeurs. Une documentation complète est prévue pour la livraison finale.
+
+    \item \textbf{Tests unitaires (au moins 4 méthodes, 2 cas chacune)} – \underline{À développer} \\
+    Les tests unitaires sont à formaliser. Les fonctions clés (\texttt{piocher\_cartes\_wagon}, \texttt{capturer\_route}, etc.) ont été testées manuellement, mais pas encore via un framework comme \texttt{pytest}. Ce point sera prioritaire pour l’étape suivante.
+
+    \item \textbf{Stockage de données (fichier ou BDD)} – \underline{Non implémentée} \\
+    À ce jour, aucune lecture ou écriture de fichier n’est réalisée. Cette figure ne semble pas essentielle dans notre sujet actuel, car la partie sauvegarde/chargement n’est pas exigée dans les objectifs pédagogiques. Elle pourrait être utilisée en option pour mémoriser l’état du plateau ou une configuration.
+
+\end{itemize}
+
+\section*{2. Figures supplémentaires choisies pour le sujet}
+
+\begin{itemize}
+    \item \textbf{Algorithme d’optimisation} – \underline{À venir} \\
+    Un joueur intelligent (objectif 4) est prévu. Il devra construire un sous-graphe reliant ses objectifs en minimisant le nombre d’arêtes ou de couleurs utilisées. Cette tâche est liée à un problème d’arbre de Steiner et constitue un bon candidat pour l’optimisation.
+
+    \item \textbf{Fonction récursive} – \underline{Non encore utilisée} \\
+    Aucune fonction récursive n’est présente pour le moment. Elle pourrait être introduite dans le calcul du plus long chemin (bonus de 10 points), via une exploration récursive du graphe de routes du joueur.
+
+    \item \textbf{Exploration de graphe avec bibliothèque dédiée} – \underline{Implémentée} \\
+    Le projet utilise \texttt{networkx} pour représenter et manipuler le graphe du plateau. Cela inclut la détection des routes disponibles, la suppression d’arêtes, l’évaluation des composantes connexes. Cette figure est donc clairement remplie.
+
+\end{itemize}
+
+\section*{3. Figures non pertinentes dans le cadre de ce projet}
+
+Les figures suivantes ne sont pas jugées pertinentes dans notre cas :
+
+\begin{itemize}
+    \item \textbf{Calcul vectoriel} : non applicable, car le projet ne traite pas de données vectorielles ou numériques en masse.
+    \item \textbf{Design patterns type}
+
+\end{itemize}
