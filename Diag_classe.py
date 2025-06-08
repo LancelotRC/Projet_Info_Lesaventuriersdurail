@@ -11,7 +11,7 @@ classes = [
 ]
 G.add_nodes_from(classes)
 
-# Relations
+# Relations d'héritage et de composition
 heritage = [
     ("PiocheWagon", "Pioche"),
     ("PiocheItineraire", "Pioche"),
@@ -23,20 +23,22 @@ composition = [
     ("Table", "PiocheWagon"), ("Table", "PiocheItineraire"),
     ("Plateau", "Ville"), ("Plateau", "Route"),
     ("PiocheWagon", "CarteWagon"), ("PiocheItineraire", "CarteItineraire"),
-    ("Joueur", "CarteWagon"), ("Joueur", "CarteItineraire")
+    ("Joueur", "CarteWagon"), ("Joueur", "CarteItineraire"),
+    ("Joueur", "Route")  # 🔁 Ajout : lien capture
 ]
 G.add_edges_from(heritage + composition)
 
-# Positions manuelles
+# Positionnement
 pos = {
-    "Table": (0, 0),
-    "Plateau": (-2.5, -1), "Ville": (-3.5, -2), "Route": (-1.5, -2),
-    "Joueur": (2.5, -1), "CarteWagon": (2, -2.2), "CarteItineraire": (3, -2.2),
-    "Carte": (2.5, -3.2),
-    "PiocheWagon": (-1, 1), "PiocheItineraire": (1, 1), "Pioche": (0, 2)
+    "Carte": (2, 2.5), "Pioche": (0, 2.5),
+    "CarteWagon": (2.5, 1.5), "CarteItineraire": (1.5, 1.5),
+    "PiocheWagon": (-0.5, 1.5), "PiocheItineraire": (0.5, 1.5),
+    "Table": (1, 0),
+    "Plateau": (0, -1), "Ville": (-0.5, -2), "Route": (0.5, -2),
+    "Joueur": (2, -1),
 }
 
-# Couleurs
+# Couleurs des nœuds
 node_colors = []
 for node in G.nodes():
     if node == "Pioche":
@@ -50,7 +52,7 @@ for node in G.nodes():
     elif node in ["Ville", "Route"]:
         node_colors.append("lightgreen")
     elif node == "Plateau":
-        node_colors.append("gold")
+        node_colors.append("lightgreen")
     elif node == "Joueur":
         node_colors.append("orange")
     elif node == "Table":
@@ -58,52 +60,65 @@ for node in G.nodes():
     else:
         node_colors.append("lightyellow")
 
-# Edge labels
+# Labels des arêtes
 edge_labels = {edge: "hérite" for edge in heritage}
 edge_labels.update({edge: "contient" for edge in composition})
+edge_labels[("Joueur", "Route")] = "capture"  # Etiquette spéciale
 
 # Tracé
 plt.figure(figsize=(15, 13))
 ax = plt.gca()
 
-# Tracer les arêtes avec style conditionnel et labels intégrés
-for u, v in G.edges():
-    # Déterminer si la flèche doit être courbée
-    if (u, v) in [("PiocheWagon", "CarteWagon"), ("PiocheItineraire", "CarteItineraire")]:
-        style = "arc3,rad=0.3"
-    else:
-        style = "arc3,rad=0"
+# Catégories pour les couleurs de flèches
+pioche_nodes = {"Pioche", "PiocheWagon", "PiocheItineraire"}
+carte_nodes = {"Carte", "CarteWagon", "CarteItineraire"}
+plateau_nodes = {"Plateau", "Ville", "Route"}
 
-    # Tracer la flèche
+for u, v in G.edges():
+    style = "arc3,rad=0.3" if (u, v) in [
+        ("PiocheWagon", "CarteWagon"),
+        ("PiocheItineraire", "CarteItineraire")
+    ] else "arc3,rad=0"
+
+    # couleur selon branche
+    if {u, v} <= pioche_nodes:
+        edge_color = "purple"
+    elif {u, v} <= carte_nodes:
+        edge_color = "deepskyblue"
+    elif {u, v} <= plateau_nodes:
+        edge_color = "green"
+    elif (u, v) in heritage:
+        edge_color = "black"
+    else:
+        edge_color = "gray"
+
     ax.annotate("",
                 xy=pos[v], xycoords='data',
                 xytext=pos[u], textcoords='data',
                 arrowprops=dict(arrowstyle='-|>',
-                                color='gray',
+                                color=edge_color,
                                 shrinkA=15, shrinkB=15,
                                 connectionstyle=style))
 
-    # Tracer le label
     label = edge_labels.get((u, v), "")
     if label:
         x_src, y_src = pos[u]
         x_dst, y_dst = pos[v]
         x_mid, y_mid = (x_src + x_dst) / 2, (y_src + y_dst) / 2
+
+        # Placement spécial pour les arêtes incurvées
         if (u, v) == ("PiocheWagon", "CarteWagon"):
-            ax.text(x_mid - 0.5, y_mid - 0.6, label, fontsize=9, color='red', ha='center')
+            ax.text(x_mid + 0.025, y_mid - 0.2, label, fontsize=9, color='red', ha='center')
         elif (u, v) == ("PiocheItineraire", "CarteItineraire"):
-            ax.text(x_mid - 0.5, y_mid - 0.6, label, fontsize=9, color='red', ha='center')
-        elif (u, v) == ("Table", "Joueur"):
-            ax.text(x_mid*0.5, y_mid*0.5 + 0.1 , label, fontsize=9, color='red', ha='center')
-        elif (u, v) == ("Table", "Plateau"):
-            ax.text(x_mid * 1.5, y_mid * 1.5 + 0.1, label, fontsize=9, color='red', ha='center')
+            ax.text(x_mid + 0.25, y_mid - 0.7, label, fontsize=9, color='red', ha='center')
         else:
             ax.text(x_mid, y_mid + 0.1, label, fontsize=9, color='red', ha='center')
 
-# Tracer les nœuds et labels
+# Nœuds et étiquettes
 nx.draw_networkx_nodes(G, pos, node_size=3000, node_color=node_colors, ax=ax)
 nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold', ax=ax)
 
-plt.title("Diagramme de classes – flèches courbes et labels intégrés", fontsize=14, fontweight='bold')
+plt.title("Diagramme de classes – héritage vs composition", fontsize=14, fontweight='bold')
 plt.axis('off')
 plt.show()
+
