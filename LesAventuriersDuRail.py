@@ -13,6 +13,17 @@ from PIL import Image
 from matplotlib import image as mpimg
 
 #endregion
+COULEURS_MATPLOTLIB = {
+    "rouge": "red",
+    "bleu": "blue",
+    "vert": "green",
+    "jaune": "yellow",
+    "noir": "black",
+    "blanc": "white",
+    "rose": "pink",
+    "orange": "orange",
+    "locomotive": "gray",  # facultatif, visuel pour les locomotives
+}
 
 #region === definition des données pour le jeu version USA ===
 VILLES_USA_normalised = {
@@ -523,7 +534,7 @@ class Table:
         print("✅ Partie chargée depuis 'sauvegarde.json'")
         return table
 
-                        
+                       
                     
     def choisir_si_enregistrer(self, joueur):
         """Permet au joueur de choisir s'il veut enregistrer ou quitter"""
@@ -996,11 +1007,13 @@ class Plateau:
             px, py = (-uy / norme) * 5, (ux / norme) * 5
 
             # Couleur de la bordure (route) et remplissage
-            border_color = route.couleur
+            border_color = COULEURS_MATPLOTLIB.get(route.couleur, "gray")
+
             if route.possesseur is None:
                 fill_color = "white"
             else:
-                fill_color = route.possesseur.couleur
+                fill_color = COULEURS_MATPLOTLIB.get(route.possesseur.couleur, "gray")
+
 
             # Tracer les wagons
             wagon_length = 23
@@ -1050,7 +1063,8 @@ class Plateau:
 
         # Ajouter les routes comme arêtes
         for route in self.routes:
-            color = route.couleur if route.etat == "disponible" else "purple"  # Couleur normale ou gris pour les capturées
+            couleur_base = COULEURS_MATPLOTLIB.get(route.couleur, "gray")
+            color = couleur_base if route.etat == "disponible" else "purple"
             style = "solid" if route.etat == "disponible" else "dotted"  # Style de ligne
             G.add_edge(route.Ville1.nom, route.Ville2.nom, color=color, style=style, weight=route.longueur)
 
