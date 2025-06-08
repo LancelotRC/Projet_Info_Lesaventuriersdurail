@@ -13,17 +13,17 @@ from PIL import Image
 from matplotlib import image as mpimg
 
 #endregion
-COULEURS_MATPLOTLIB = {
-    "rouge": "red",
-    "bleu": "blue",
-    "vert": "green",
-    "jaune": "yellow",
-    "noir": "black",
-    "blanc": "white",
-    "rose": "pink",
-    "orange": "orange",
-    "locomotive": "gray",  # facultatif, visuel pour les locomotives
-}
+# COULEURS_MATPLOTLIB = {
+#     "rouge": "red",
+#     "bleu": "blue",
+#     "vert": "green",
+#     "jaune": "yellow",
+#     "noir": "black",
+#     "blanc": "white",
+#     "rose": "pink",
+#     "orange": "orange",
+#     "locomotive": "gray",  # facultatif, visuel pour les locomotives
+# }
 
 #region === definition des données pour le jeu version USA ===
 VILLES_USA_normalised = {
@@ -108,12 +108,12 @@ VILLES_USA = {
 
 # Définition des routes (Ville1, Ville2, couleur, longueur)
 ROUTES_USA = [
-    ("Vancouver", "Calgary", "grey", 3, False),
-    ("Vancouver", "Seattle", "grey", 1, True),
-    ("Vancouver", "Seattle", "grey", 1, True),
-    ("Seattle", "Calgary", "grey", 4, False),
-    ("Seattle", "Portland", "grey", 1, True),
-    ("Seattle", "Portland", "grey", 1, True),
+    ("Vancouver", "Calgary", "gray", 3, False),
+    ("Vancouver", "Seattle", "gray", 1, True),
+    ("Vancouver", "Seattle", "gray", 1, True),
+    ("Seattle", "Calgary", "gray", 4, False),
+    ("Seattle", "Portland", "gray", 1, True),
+    ("Seattle", "Portland", "gray", 1, True),
     ("Portland", "Salt Lake City", "blue", 6, False),
     ("Portland", "San Francisco", "green", 5, True),
     ("Portland", "San Francisco", "green", 5, True),
@@ -121,13 +121,13 @@ ROUTES_USA = [
     ("San Francisco", "Salt Lake City", "white", 5, True),
     ("San Francisco", "Los Angeles", "pink", 3, True),
     ("San Francisco", "Los Angeles", "yellow", 3, True),
-    ("Los Angeles", "Las Vegas", "grey", 2, False),
-    ("Los Angeles", "Phoenix", "grey", 3, False),
+    ("Los Angeles", "Las Vegas", "gray", 2, False),
+    ("Los Angeles", "Phoenix", "gray", 3, False),
     ("Los Angeles", "El Paso", "black", 6, False),
     ("Calgary", "Winnipeg", "white", 5, False),
     ("Helena", "Winnipeg", "blue", 4, False),
     ("Helena", "Seattle", "yellow", 6, False),
-    ("Helena", "Calgary", "grey", 4, False),
+    ("Helena", "Calgary", "gray", 4, False),
     ("Helena", "Denver", "green", 4, False),
     ("Helena", "Duluth", "orange", 6, False),
     ("Helena", "Omaha", "red", 5, False),
@@ -135,76 +135,76 @@ ROUTES_USA = [
     ("Salt Lake City", "Denver", "red", 3, True),
     ("Salt Lake City", "Denver", "yellow", 3, True),
     ("Salt Lake City", "Las Vegas", "orange", 3, False),
-    ("Phoenix", "El Paso", "grey", 3, False),
-    ("Phoenix", "Santa Fe", "grey", 3, False),
+    ("Phoenix", "El Paso", "gray", 3, False),
+    ("Phoenix", "Santa Fe", "gray", 3, False),
     ("Phoenix", "Denver", "white", 3, False),
     ("Denver", "Kansas City", "black", 4, True),
     ("Denver", "Kansas City", "orange", 4, True),
     ("Denver", "Oklahoma City", "red", 4, False),
-    ("Denver", "Santa Fe", "grey", 2, False),
+    ("Denver", "Santa Fe", "gray", 2, False),
     ("Denver", "Omaha", "pink", 4, False),
     ("Santa Fe", "Oklahoma City", "blue", 3, False),
-    ("Santa Fe", "El Paso", "grey", 3, False),
+    ("Santa Fe", "El Paso", "gray", 3, False),
     ("El Paso", "Dallas", "red", 4, False),
     ("El Paso", "Houston", "green", 6, False),
     ("El Paso", "Oklahoma City", "yellow", 5, False),
-    ("Winnipeg", "Sault Ste Marie", "grey", 6, False),
+    ("Winnipeg", "Sault Ste Marie", "gray", 6, False),
     ("Winnipeg", "Duluth", "black", 6, False),
-    ("Duluth", "Omaha", "grey", 2, True),
-    ("Duluth", "Omaha", "grey", 2, True),
-    ("Duluth", "Sault Ste Marie", "grey", 3, False),
+    ("Duluth", "Omaha", "gray", 2, True),
+    ("Duluth", "Omaha", "gray", 2, True),
+    ("Duluth", "Sault Ste Marie", "gray", 3, False),
     ("Duluth", "Toronto", "pink", 6, False),
     ("Duluth", "Chicago", "red", 3, False),
-    ("Omaha", "Kansas City", "grey", 1, True),
-    ("Omaha", "Kansas City", "grey", 1, True),
+    ("Omaha", "Kansas City", "gray", 1, True),
+    ("Omaha", "Kansas City", "gray", 1, True),
     ("Omaha", "Chicago", "blue", 4, False),
     ("Kansas City", "Saint Louis", "blue", 2, True),
     ("Kansas City", "Saint Louis", "pink", 2, True),
-    ("Kansas City", "Oklahoma City", "grey", 2, True),
-    ("Kansas City", "Oklahoma City", "grey", 2, True),
-    ("Oklahoma City", "Dallas", "grey", 2, True),
-    ("Oklahoma City", "Dallas", "grey", 2, True),
-    ("Oklahoma City", "Little Rock", "grey", 2, False),
-    ("Dallas", "Houston", "grey", 1, True),
-    ("Dallas", "Houston", "grey", 1, True),
-    ("Dallas", "Little Rock", "grey", 2, False),
-    ("Houston", "New Orleans", "grey", 2, False),
+    ("Kansas City", "Oklahoma City", "gray", 2, True),
+    ("Kansas City", "Oklahoma City", "gray", 2, True),
+    ("Oklahoma City", "Dallas", "gray", 2, True),
+    ("Oklahoma City", "Dallas", "gray", 2, True),
+    ("Oklahoma City", "Little Rock", "gray", 2, False),
+    ("Dallas", "Houston", "gray", 1, True),
+    ("Dallas", "Houston", "gray", 1, True),
+    ("Dallas", "Little Rock", "gray", 2, False),
+    ("Houston", "New Orleans", "gray", 2, False),
     ("Little Rock", "New Orleans", "green", 3, False),
-    ("Little Rock", "Saint Louis", "grey", 2, False),
+    ("Little Rock", "Saint Louis", "gray", 2, False),
     ("Little Rock", "Nashville", "white", 3, False),
-    ("Saint Louis", "Nashville", "grey", 2, False),
+    ("Saint Louis", "Nashville", "gray", 2, False),
     ("Saint Louis", "Pittsburgh", "green", 5, False),
     ("Saint Louis", "Chicago", "green", 2, False),
     ("Chicago", "Pittsburgh", "orange", 3, True),
     ("Chicago", "Pittsburgh", "black", 3, True),
     ("Chicago", "Toronto", "white", 4, False),
     ("Sault Ste Marie", "Montreal", "black", 5, False),
-    ("Sault Ste Marie", "Toronto", "grey", 2, False),
-    ("Toronto", "Pittsburgh", "grey", 2, False),
-    ("Toronto", "Montreal", "grey", 3, False),
+    ("Sault Ste Marie", "Toronto", "gray", 2, False),
+    ("Toronto", "Pittsburgh", "gray", 2, False),
+    ("Toronto", "Montreal", "gray", 3, False),
     ("Montreal", "New York", "blue", 3, False),
-    ("Montreal", "Boston", "grey", 2, True),
-    ("Montreal", "Boston", "grey", 2, True),
+    ("Montreal", "Boston", "gray", 2, True),
+    ("Montreal", "Boston", "gray", 2, True),
     ("Boston", "New York", "yellow", 2, True),
     ("Boston", "New York", "red", 2, True),
     ("New York", "Pittsburgh", "green", 2, True),
     ("New York", "Pittsburgh", "white", 2, True),
     ("New York", "Washington", "black", 2, True),
     ("New York", "Washington", "orange", 2, True),
-    ("Pittsburgh", "Washington", "grey", 2, False),
-    ("Pittsburgh", "Raleigh", "grey", 2, False),
+    ("Pittsburgh", "Washington", "gray", 2, False),
+    ("Pittsburgh", "Raleigh", "gray", 2, False),
     ("Pittsburgh", "Nashville", "yellow", 4, False),
-    ("Raleigh", "Charleston", "grey", 2, False),
-    ("Raleigh", "Washington", "grey", 2, True),
-    ("Raleigh", "Washington", "grey", 2, True),
+    ("Raleigh", "Charleston", "gray", 2, False),
+    ("Raleigh", "Washington", "gray", 2, True),
+    ("Raleigh", "Washington", "gray", 2, True),
     ("Raleigh", "Nashville", "black", 3, False),
-    ("Raleigh", "Atlanta", "grey", 3, True),
-    ("Raleigh", "Atlanta", "grey", 3, True),
-    ("Atlanta", "Nashville", "grey", 1, False),
+    ("Raleigh", "Atlanta", "gray", 3, True),
+    ("Raleigh", "Atlanta", "gray", 3, True),
+    ("Atlanta", "Nashville", "gray", 1, False),
     ("Atlanta", "Miami", "blue", 5, False),
     ("Atlanta", "New Orleans", "yellow", 4, True),
     ("Atlanta", "New Orleans", "orange", 4, True),
-    ("Atlanta", "Charleston", "grey", 2, False),
+    ("Atlanta", "Charleston", "gray", 2, False),
     ("Miami", "Charleston", "pink", 4, False),
     ("Miami", "New Orleans", "red", 6, False),
 ]
@@ -381,7 +381,7 @@ class Table:
             if carte1.is_locomotive and pioche == 1:
                 print(f"{joueur.nom} a pioché une locomotive et ne peut pas prendre de deuxième carte. Fin du tour.")
                 Loco = True
-                return  Loco# ✅ Arrêt immédiat
+                return  Loco# Arrêt immédiat
 
             # Deuxième tirage
             carte2 = self.choisir_carte_wagon(interdit_locomotive=True) [0]
@@ -410,7 +410,7 @@ class Table:
                 self.afficher_cartes_visibles()
 
                 try:
-                    index = int(input("Choisissez une carte visible (1-5) : ")) - 1  # ✅ Ajustement pour l’index
+                    index = int(input("Choisissez une carte visible (1-5) : ")) - 1  # Ajustement pour l’index
 
                     if index < 0 or index >= len(self.pioche_wagon.visible):
                         print("Choix invalide. Veuillez choisir un numéro entre 1 et 5.")
@@ -531,7 +531,7 @@ class Table:
                         joueur.routes_capturees.append(route)
                         break
 
-        print("✅ Partie chargée depuis 'sauvegarde.json'")
+        print(" Partie chargée depuis 'sauvegarde.json'")
         return table
 
                        
@@ -597,7 +597,7 @@ class Table:
     def afficher_cartes_visibles(self):
         """Affiche les cartes visibles avec une numérotation de 1 à 5"""
         print("\nCartes visibles :")
-        for i, carte in enumerate(self.pioche_wagon.visible, start=1):  # ✅ Numérotation commence à 1
+        for i, carte in enumerate(self.pioche_wagon.visible, start=1):  # Numérotation commence à 1
             print(f"{i}: {carte.couleur}")
 
     def afficher_routes_disponibles(self) -> None:
@@ -980,9 +980,9 @@ class Plateau:
         #visualisation des routes avec des rectangles
         fig, ax = plt.subplots(figsize=(11.74, 7.42))
 
-        #fig.patch.set_facecolor("#faf0e6")
-        #ax.set_facecolor("#faf0e6")
-        #ax.patch.set_facecolor("#faf0e6")
+        # fig.patch.set_facecolor("#faf0e6")
+        # ax.set_facecolor("#faf0e6")
+        # ax.patch.set_facecolor("#faf0e6")
         img = mpimg.imread("plateau.png")
         img_flipped = np.flipud(img)
         ax.imshow(img_flipped, extent=[0, 768, 0, 517], zorder=0)
@@ -1007,12 +1007,14 @@ class Plateau:
             px, py = (-uy / norme) * 5, (ux / norme) * 5
 
             # Couleur de la bordure (route) et remplissage
-            border_color = COULEURS_MATPLOTLIB.get(route.couleur, "gray")
+            border_color = route.couleur
+            # COULEURS_MATPLOTLIB.get(route.couleur, "gray")
 
             if route.possesseur is None:
                 fill_color = "white"
             else:
-                fill_color = COULEURS_MATPLOTLIB.get(route.possesseur.couleur, "gray")
+                # fill_color = COULEURS_MATPLOTLIB.get(route.possesseur.couleur, "gray")
+                fill_color = route.possesseur.couleur if route.possesseur else "white"
 
 
             # Tracer les wagons
@@ -1063,8 +1065,8 @@ class Plateau:
 
         # Ajouter les routes comme arêtes
         for route in self.routes:
-            couleur_base = COULEURS_MATPLOTLIB.get(route.couleur, "gray")
-            color = couleur_base if route.etat == "disponible" else "purple"
+            border_color = route.couleur
+            color = route.couleur if route.etat == "disponible" else "purple"
             style = "solid" if route.etat == "disponible" else "dotted"  # Style de ligne
             G.add_edge(route.Ville1.nom, route.Ville2.nom, color=color, style=style, weight=route.longueur)
 
