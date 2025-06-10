@@ -8,8 +8,12 @@ import numpy as np
 from collections import Counter
 import builtins
 from matplotlib import image as mpimg
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
-from collections import Counter
+import PyQt5
+import PyQt5.QtWidgets as qw
+import PyQt5.QtGui as qg
+import PyQt5.QtCore as qc
+import sys
+import traceback
 
 # endregion
 
@@ -124,7 +128,7 @@ ROUTES_USA = [
     ("Salt Lake City", "Las Vegas", "orange", 3, False),
     ("Phoenix", "El Paso", "grey", 3, False),
     ("Phoenix", "Santa Fe", "grey", 3, False),
-    ("Phoenix", "Denver", "white", 3, False),
+    ("Phoenix", "Denver", "white", 5, False),
     ("Denver", "Kansas City", "black", 4, True),
     ("Denver", "Kansas City", "orange", 4, True),
     ("Denver", "Oklahoma City", "red", 4, False),
@@ -213,6 +217,328 @@ CARTES_DESTINATION_USA = [
 
 # endregion
 
+# region === GUI ===
+
+class PlateauWidget(qw.QMainWindow):
+    def __init__(self, table, callback_capturer_route, callback_piocher_itineraire, callback_piocher_wagon):
+        super().__init__()
+        self.table = table
+        self.plateau = table.plateau
+        self.callback_capturer_route = callback_capturer_route
+        self.callback_piocher_wagon = callback_piocher_wagon
+        self.callback_piocher_itineraire = callback_piocher_itineraire
+
+        # --- Structure de la fenêtre principale ---
+        central_widget = qw.QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = qw.QHBoxLayout(central_widget)
+
+        # Partie graphique : le plateau
+        self.scene = qw.QGraphicsScene()
+        self.view = qw.QGraphicsView(self.scene)
+        main_layout.addWidget(self.view)
+
+        # Partie de droite : cartes visibles + main du joueur
+        right_widget = qw.QWidget()
+        right_layout = qw.QVBoxLayout(right_widget)
+        main_layout.addWidget(right_widget)
+
+        # Cartes visibles (pioche)
+        self.cartes_widget = qw.QWidget()
+        self.cartes_layout = qw.QVBoxLayout(self.cartes_widget)
+        right_layout.addWidget(self.cartes_widget)
+
+        # Cartes visibles
+        for i, carte in enumerate(self.table.pioche_wagon.visible):
+            bouton = qw.QPushButton(str(carte))
+            bouton.clicked.connect(lambda _, idx=i: self.callback_piocher_wagon("visible", idx))
+            self.cartes_layout.addWidget(bouton)
+
+        # Pioche cachée
+        cachee_btn = qw.QPushButton("Piocher face cachée")
+        cachee_btn.clicked.connect(lambda: self.callback_piocher_wagon("cachee"))
+        self.cartes_layout.addWidget(cachee_btn)
+
+        # Cartes du joueur
+        self.cartes_joueur_widget = qw.QWidget()
+        self.cartes_joueur_layout = qw.QHBoxLayout(self.cartes_joueur_widget)
+        self.cartes_joueur_widget.setMinimumHeight(60)
+        self.cartes_joueur_widget.setStyleSheet("border: 1px solid gray;")
+        right_layout.addWidget(self.cartes_joueur_widget)
+
+        # Affichages initiaux
+        self.rects = []
+        self.afficher_routes()
+        self.afficher_cartes()
+        self.afficher_joueur()
+
+    def afficher_routes(self):
+        self.scene.clear()
+
+        # === Affichage du fond ===
+        pixmap = qg.QPixmap("plateau.png")
+        item_fond = qw.QGraphicsPixmapItem(pixmap)
+        self.scene.addItem(item_fond)
+
+        self.rects = []
+
+        for route in self.plateau.routes:
+            x1, y1 = route.Ville1.coordonnees
+            x2, y2 = route.Ville2.coordonnees
+
+            dx, dy = x2 - x1, y2 - y1
+            L = (dx ** 2 + dy ** 2) ** 0.5
+            ux, uy = dx / L, dy / L
+            norme = (ux ** 2 + uy ** 2) ** 0.5
+            px, py = (-uy / norme) * 5, (ux / norme) * 5
+
+            # couleurs
+            border_color = route.couleur
+            if route.possesseur is None:
+                fill_color = "white"
+            else:
+                fill_color = route.possesseur.couleur
+
+            wagon_length = 23
+            wagon_height = 7
+            total_wagon_length = wagon_length * route.longueur
+            gap = (L - total_wagon_length) / (route.longueur + 1)
+
+            i = 1
+            if route.double:
+                i = -i
+
+            for j in range(route.longueur):
+                d = gap * (j + 1) + wagon_length * j + wagon_length / 2
+                fraction = d / L
+                cx = x1 + fraction * dx
+                cy = y1 + fraction * dy
+                if route.double:
+                    cx += px * i
+                    cy += py * i
+
+                rect = qw.QGraphicsRectItem(-wagon_length / 2, -wagon_height / 2, wagon_length, wagon_height)
+                rect.setBrush(qg.QBrush(qg.QColor(fill_color)))
+                rect.setPen(qg.QPen(qg.QColor(border_color), 2.5))
+                rect.setToolTip(f"{route.Ville1.nom} → {route.Ville2.nom}")
+                rect.setPos(cx, cy)
+                angle = np.degrees(np.arctan2(dy, dx))
+                rect.setRotation(angle)
+
+                # Rendre le wagon cliquable
+                rect.mousePressEvent = lambda event, r=route: self.route_cliquee(r)
+
+                self.scene.addItem(rect)
+                self.rects.append(rect)
+
+    def afficher_cartes(self):
+        # Nettoyer
+        for i in reversed(range(self.cartes_layout.count())):
+            self.cartes_layout.itemAt(i).widget().deleteLater()
+
+        # Cartes Wagon visibles
+        for i, carte in enumerate(self.table.pioche_wagon.visible):
+
+            bouton = qw.QPushButton(str(carte.couleur))
+            bouton.setStyleSheet(f"background-color: {carte.couleur};")
+            bouton.clicked.connect(lambda _, idx=i: self.callback_piocher_wagon(source='visible', index=i))
+            self.cartes_layout.addWidget(bouton)
+
+        # Pioche cachée
+        bouton_pioche_cachee = qw.QPushButton("Pioche Wagon (face cachée)")
+        bouton_pioche_cachee.clicked.connect(lambda checked=False: self.callback_piocher_wagon(source='cachee'))
+        self.cartes_layout.addWidget(bouton_pioche_cachee)
+
+        # Pioche itinéraire
+        bouton_itineraire = qw.QPushButton("Pioche Itinéraire")
+        bouton_itineraire.clicked.connect(self.callback_piocher_itineraire)
+        self.cartes_layout.addWidget(bouton_itineraire)
+
+    def afficher_joueur(self):
+        # Vider les anciens widgets
+        while self.cartes_joueur_layout.count():
+            item = self.cartes_joueur_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        joueur = self.table.joueur_actuel  # ou self.table.joueurs[self.table.joueur_courant_index]
+        for carte in joueur.cartes_wagon:
+            bouton = qw.QPushButton(str(carte.couleur))
+            bouton.setStyleSheet(f"background-color: {carte.couleur};")
+            self.cartes_joueur_layout.addWidget(bouton)
+
+        for destinations in joueur.cartes_defi:
+            bouton = qw.QPushButton(str(destinations.ville_depart.nom) + str(destinations.ville_arrivee.nom) + str(destinations.points))
+
+        bouton = qw.QPushButton(str(joueur.wagons_restants)+"wagons restants")
+        bouton.setStyleSheet(f"background-color: {joueur.couleur};")
+        self.cartes_joueur_layout.addWidget(bouton)
+
+    def refresh(self):
+        self.afficher_routes()
+        self.afficher_cartes()
+        self.afficher_joueur()
+        self.update()
+
+    def route_cliquee(self, route):
+        self.callback_capturer_route(route)
+
+    def piocher_wagon(self):
+        pass
+
+class FenetrePrincipale(qw.QMainWindow):
+    def __init__(self, table):
+        super().__init__()
+        self.table = table
+        self.setWindowTitle("Les Aventuriers du Rail")
+
+        self.plateau_widget = PlateauWidget(
+            self.table,
+            self.capturer_route,
+            self.piocher_itineraire,
+            self.callback_piocher_wagon
+        )
+        self.bouton_init = qw.QPushButton("Initialiser la partie")
+        self.bouton_init.clicked.connect(self.initialiser_partie)
+        self.layout().addWidget(self.bouton_init)
+
+        layout = qw.QVBoxLayout()
+        layout.addWidget(self.plateau_widget)
+
+        central = qw.QWidget()
+        central.setLayout(layout)
+        self.setCentralWidget(central)
+
+    def initialiser_partie(self):
+        self.table.initialiser_partie()
+        self.plateau_widget.refresh()
+
+    def capturer_route(self, route):
+        joueur = self.table.joueurs[0]  # pour l’instant : joueur 1
+        if route.possesseur is None and joueur.verifier_cartes_wagon(route):
+            self.table.defausser_cartes_wagon(joueur, route)
+            route.possesseur = joueur
+            joueur.routes_capturees.append(route)
+            joueur.wagons_restants -= route.longueur
+            print(f"{joueur.nom} a capturé {route.Ville1.nom} → {route.Ville2.nom}")
+            self.plateau_widget.afficher_routes()
+        else:
+            print("Impossible de capturer cette route.")
+
+    def piocher_itineraire(self):
+        cartes = self.table.pioche_itineraire.piocher_cartes()
+        # à toi de définir l'interface pour en garder certaines, par exemple :
+        print("Cartes piochées :", cartes)
+        self.table.joueur_actif.ajouter_cartes_itineraire(cartes[:2])  # à adapter selon ta règle
+
+    def choisir_cartes_itineraire_dialogue(self, nom_joueur, cartes):
+        dialog = ChoixCartesItineraireDialog(nom_joueur, cartes)
+        result = dialog.exec_()
+
+        if result == qw.QDialog.Accepted:
+            return dialog.cartes_a_garder()
+        else:
+            return cartes, []  # sécurité si annulé
+
+    def callback_piocher_wagon(self, source, index=None):
+        joueur = self.table.joueur_courant
+        pioche = self.table.pioche_wagon
+
+        try:
+            # 🚫 Si le joueur a déjà pris une carte visible locomotive, il ne peut plus piocher
+            if joueur.a_deja_pioche_une_carte == "loco":
+                print("Vous avez déjà pioché une locomotive visible. Fin du tour.")
+                return
+
+            # 🂠 Pioche cachée
+            if source == "cachee":
+                carte = pioche.piocher_cachee()
+                if not carte:
+                    print("Plus de cartes.")
+                    return
+                joueur.cartes_wagon.append(carte)
+                print(f"Carte cachée piochée : {carte.couleur}")
+
+                if joueur.a_deja_pioche_une_carte:
+                    joueur.finir_tour()
+                else:
+                    joueur.a_deja_pioche_une_carte = True
+                self.refresh()
+                return
+
+            # 🂫 Pioche visible
+            elif source == "visible":
+                if index is None or index < 0 or index >= len(pioche.visible):
+                    print("Indice invalide.")
+                    return
+                carte = pioche.visible[index]
+
+                if joueur.a_deja_pioche_une_carte and carte.is_locomotive:
+                    print("❌ Impossible de prendre une locomotive en 2e pioche.")
+                    return
+
+                # Piocher la carte
+                pioche.piocher_visible(index)
+                joueur.cartes_wagon.append(carte)
+                print(f"Carte visible piochée : {carte.couleur}")
+
+                if carte.is_locomotive:
+                    joueur.a_deja_pioche_une_carte = "loco"
+                    joueur.finir_tour()
+                elif joueur.a_deja_pioche_une_carte:
+                    joueur.finir_tour()
+                else:
+                    joueur.a_deja_pioche_une_carte = True
+                self.refresh()
+                return
+
+            else:
+                print("❌ Source de pioche inconnue.")
+
+        except Exception as e:
+            print("Erreur :", e)
+            traceback.print_exc()
+
+
+class ChoixCartesItineraireDialog(qw.QDialog):
+    def __init__(self, nom_joueur, cartes):
+        super().__init__()
+        self.setWindowTitle(f"{nom_joueur} – Choisissez vos cartes destination")
+        self.cartes = cartes
+        self.cartes_reposees = []
+
+        layout = qw.QVBoxLayout()
+        self.checkboxes = []
+
+        for carte in cartes:
+            cb = qw.QCheckBox(str(carte))
+            cb.setChecked(True)  # cochées par défaut
+            layout.addWidget(cb)
+            self.checkboxes.append(cb)
+
+        self.bouton_valider = qw.QPushButton("Valider")
+        self.bouton_valider.clicked.connect(self.valider_et_fermer)
+        layout.addWidget(self.bouton_valider)
+
+        self.setLayout(layout)
+
+    def valider_et_fermer(self):
+        gardees = [carte for cb, carte in zip(self.checkboxes, self.cartes) if cb.isChecked()]
+        if len(gardees) == 0:
+            qw.QMessageBox.warning(self, "Erreur", "Vous devez garder au moins une carte.")
+            return
+        self.accept()  # ferme proprement la boîte
+
+    def cartes_a_garder(self):
+        gardees, reposees = [], []
+        for cb, carte in zip(self.checkboxes, self.cartes):
+            (gardees if cb.isChecked() else reposees).append(carte)
+        return gardees, reposees
+
+# endregion
+
+
 # region === Classes principales ===
 
 # Classe principale regroupant tout
@@ -227,84 +553,66 @@ class Table:
             [CarteItineraire(self.plateau.dico_villes[v1], self.plateau.dico_villes[v2], p) for v1, v2, p in
              CARTES_DESTINATION_USA])
         self.score = 0
+        self.joueur_courant_index = 0
 
-    def initialiser_partie(self):
-        """Distribue les cartes de départ aux joueurs avec restriction de repose à une seule carte maximum."""
+    @property
+    def joueur_actuel(self):
+        return self.joueurs[self.joueur_courant_index]
+
+    def initialiser_partie(self, fenetre=None):
         for joueur in self.joueurs:
-            joueur.cartes_wagon = [self.pioche_wagon.piocher_cachee() for _ in range(4)]
-            cartes_itineraire = self.pioche_itineraire.piocher()
-
-            # Appliquer la restriction de repose d'une seule carte seulement au début
-            if isinstance(joueur, JoueurAuto):
-                cartes_gardees, cartes_reposees = cartes_itineraire, []  # on ne laisse pas le choix au joueur auto
+            cartes = self.pioche_itineraire.piocher()
+            if fenetre is not None:
+                cartes_gardees, cartes_reposees = fenetre.choisir_cartes_itineraire_dialogue(joueur.nom, cartes)
             else:
-                cartes_gardees, cartes_reposees = joueur.choisir_cartes_itineraire(cartes_itineraire,
-                                                                                   initialisation=True)
+                cartes_gardees = cartes
+                cartes_reposees = []
 
-            joueur.cartes_defi.extend(cartes_gardees)  # Ajouter les cartes gardées au joueur
+            joueur.cartes_defi.extend(cartes_gardees)
+            self.pioche_itineraire.replacer_en_bas(cartes_reposees)
 
-            if cartes_reposees:  # Vérifier si une carte a été reposée
-                self.pioche_itineraire.replacer_en_bas(cartes_reposees)  # Replacer en bas de la pioche
+    def jouer_tour(self, fenetre):
+        joueur = self.joueur_actuel
+        print(f"\n🔄 Tour de {joueur.nom}")
 
-    def jouer_tour(self, joueur):
-        """Permet à un joueur de jouer son tour via une interface graphique"""
+        # Mettre à jour affichage joueur
+        fenetre.plateau_widget.refresh()
 
-        # Récapitulatif des cartes wagon du joueur
-        couleurs_cartes = Counter(c.couleur for c in joueur.cartes_wagon)
-        cartes_wagon_txt = "\n".join(f"{couleur} : {nb}" for couleur, nb in couleurs_cartes.items())
-
-        # Récapitulatif des cartes destination
-        cartes_dest_txt = "\n".join(f"{c.ville_depart.nom} → {c.ville_arrivee.nom}" for c in joueur.cartes_defi)
-
-        # Message de début de tour
-        message = (
-            f"Tour de {joueur.nom}\n\n"
-            f"🎴 Cartes wagon :\n{cartes_wagon_txt or 'Aucune'}\n\n"
-            f"📍 Objectifs :\n{cartes_dest_txt or 'Aucun'}\n\n"
-            f"🚂 Wagons restants : {joueur.wagons_restants}\n"
-        )
-
-        QMessageBox.information(self.parent_widget, "Début du tour", message)
-
-        # Choix de l'action
-        options = [
-            "1. Piocher une carte wagon",
-            "2. Capturer une route",
-            "3. Piocher des cartes destination",
-            "4. Afficher le plateau",
-            "5. Quitter le jeu"
+        # Choix d’une action parmi les trois possibles
+        actions = [
+            "Piocher une carte wagon",
+            "Capturer une route",
+            "Piocher des cartes itinéraire",
+            "Annuler"
         ]
-        choix, ok = QInputDialog.getItem(
-            self.parent_widget,
+
+        choix, ok = qw.QInputDialog.getItem(
+            fenetre,
             f"Action de {joueur.nom}",
             "Choisissez une action :",
-            options,
+            actions,
             0,
             False
         )
 
-        if not ok:
-            return  # annulation
+        if not ok or choix == "Annuler":
+            return
 
-        numero = choix[0]
+        if choix == "Piocher une carte wagon":
+            fenetre.callback_piocher_wagon(source=None)  # appelle la méthode interactive de FenetrePrincipale
 
-        if numero == "1":
-            result = self.piocher_cartes_wagon(joueur)
-            if result is None:
-                self.capturer_route(joueur)
+        elif choix == "Capturer une route":
+            # Tente de capturer la première route disponible
+            for route in self.plateau.routes:
+                if route.possesseur is None and joueur.verifier_cartes_wagon(route):
+                    fenetre.capturer_route(route)
+                    break
+            else:
+                qw.QMessageBox.information(fenetre, "Aucune route", "Aucune route n'est actuellement capturable.")
 
-        elif numero == "2":
-            self.capturer_route(joueur)
+        elif choix == "Piocher des cartes itinéraire":
+            fenetre.piocher_itineraire()
 
-        elif numero == "3":
-            self.piocher_cartes_itineraire(joueur)
-
-        elif numero == "4":
-            self.plateau.afficher_plateau_graphique()
-
-        elif numero == "5":
-            QMessageBox.information(self.parent_widget, "Fin", "Fin de la partie. Merci d’avoir joué !")
-            exit()
     def capturer_route(self, joueur):
         """Permet à un joueur de capturer une route en défaussant les cartes nécessaires"""
         print("\nRoutes disponibles :")
@@ -560,24 +868,16 @@ class Joueur:
         self.wagons_restants = 45  # Wagons restants au début
 
     def choisir_cartes_itineraire(self, cartes, initialisation=False):
-        """Permet au joueur de garder au moins une carte destination au début du jeu"""
-        print(f"\n{self.nom}, voici vos cartes destination initiales :")
-        for i, carte in enumerate(cartes):
-            print(f"{i + 1}: {carte}")
+        dialog = ChoixCartesItineraireDialog(cartes)
+        result = dialog.exec_()
 
-        cartes_a_reposer = []
-
-        choix = input("Voulez-vous garder les trois cartes (0) ou en reposer une ? (1, 2 ou 3) : ")
-        if choix in ["1", "2", "3"]:
-            cartes_a_reposer.append(cartes.pop(int(choix) - 1))
-
-        if len(cartes) > 1 and not initialisation:
-            choix2 = input("Voulez-vous reposer une autre carte ? (0 = non, sinon 1 ou 2) : ")
-            if choix2 in ["1", "2"]:
-                cartes_a_reposer.append(cartes.pop(int(choix2) - 1))
-
-        print(f"{self.nom} garde {len(cartes)} carte(s) et repose {len(cartes_a_reposer)} carte(s).")
-        return cartes, cartes_a_reposer
+        if result == qw.QDialog.Accepted:
+            cartes_reposees = dialog.cartes_reposees
+            cartes_gardees = [c for c in cartes if c not in cartes_reposees]
+            return cartes_gardees, cartes_reposees
+        else:
+            # Si annulé, on garde tout
+            return cartes, []
 
     def verifier_cartes_wagon(self, route):
         """Vérifie si le joueur possède les cartes nécessaires pour capturer la route"""
@@ -661,74 +961,6 @@ class Joueur:
         nx.draw(G, pos, with_labels=True, edge_color=couleurs, width=poids, node_size=300, font_size=8)
         plt.title(f"Routes capturées par {self.nom}")
         plt.show()
-
-
-class JoueurAuto(Joueur):
-    def __init__(self, nom, couleur):
-        super().__init__(nom, couleur)
-
-    def jouer_automatiquement(self, table):
-        """Remplace temporairement input par une version automatique pour ce tour"""
-        original_input = builtins.input
-        builtins.input = self.repond_automatiquement
-        try:
-            table.jouer_tour(self)
-        finally:
-            builtins.input = original_input
-
-    def repond_automatiquement(self, prompt):
-        prompt = prompt.lower()
-
-        if "action" in prompt:
-            return self.choisir_action()
-        elif "carte visible" in prompt:
-            return str(random.randint(1, 5))  # 1 à 5
-        elif "option" in prompt:
-            return random.choice(["1", "2"])  # cachee ou visible
-        elif "voulez-vous garder les trois" in prompt:
-            return random.choice(["0", "1", "2", "3"])
-        elif "reposer une autre carte" in prompt:
-            return random.choice(["0", "1", "2"])
-        elif "route à capturer" in prompt:
-            # Cherche tous les entiers affichés au début des lignes pour estimer combien de routes sont listées
-            lignes = prompt.split("\n")
-            indices_valides = [
-                int(ligne.split(":")[0]) for ligne in lignes
-                if ligne.strip() and ligne[0].isdigit() and ":" in ligne
-            ]
-            if indices_valides:
-                return str(random.choice(indices_valides))
-            else:
-                return "0"
-        else:
-            return "0"  # valeur par défaut
-
-    def choisir_action(self):
-        nb_cartes = len(self.cartes_wagon)
-        total_cartes_possibles = 110  # 8*12 + 14 locomotives
-
-        # proportion de la main
-        ratio_main = nb_cartes / total_cartes_possibles
-
-        # pondération de la probabilité de capturer une route
-        if nb_cartes < 3:
-            proba_capturer = 0.1
-        elif nb_cartes <= 6:
-            proba_capturer = 0.1 + 0.1 * (nb_cartes - 2)  # de 10% à 50%
-        else:
-            # entre 7 et total possible, monte de 50% jusqu'à 75%-95%
-            if ratio_main < 0.25:
-                proba_capturer = 0.75
-            elif ratio_main < 0.5:
-                proba_capturer = 0.9
-            else:
-                proba_capturer = 0.95
-
-        # tirage au sort pondéré
-        if random.random() < proba_capturer:
-            return "2"  # capturer une route
-        else:
-            return "1"  # piocher
 
 
 # endregion
@@ -853,7 +1085,6 @@ class Plateau:
         self.dico_villes = {ville.nom: ville for ville in self.villes}
         self.routes = [Route(self.dico_villes[V1], self.dico_villes[V2], couleur, longueur, double) for
                        V1, V2, couleur, longueur, double in dico_route]
-        self.afficher_plateau_graphique()
 
     def sous_graphe_joueur(self, joueur):
         G = nx.Graph()
@@ -977,7 +1208,6 @@ class Ville:
 
 # Classe représentant une route entre deux villes
 class Route:
-
     def __init__(self, Ville1, Ville2, couleur, longueur, double):
         self.Ville1 = Ville1
         self.Ville2 = Ville2
@@ -993,3 +1223,31 @@ class Route:
         self.etat = "capturée"  # Change l'état de la route à "capturée"
 
 # endregion
+
+
+
+
+
+
+if __name__ == "__main__":
+
+    app = qw.QApplication(sys.argv)
+
+    joueurs = [Joueur("Alice", "red"), Joueur("Bob", "blue")]
+    table = Table(joueurs)
+    fenetre = FenetrePrincipale(table)
+    fenetre.show()
+
+
+    def initialiser_partie_safe():
+        try:
+            table.initialiser_partie(fenetre)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            qw.QMessageBox.critical(fenetre, "Erreur", f"Erreur pendant l'initialisation :\n{e}")
+
+
+    qc.QTimer.singleShot(300, initialiser_partie_safe)
+
+    sys.exit(app.exec())
